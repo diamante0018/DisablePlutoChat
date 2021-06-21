@@ -28,7 +28,7 @@ namespace chat
     public:
         void post_unpack() override
         {
-            client_ui_hook.create(0x047EA40, &client_ui_stub);
+            client_ui_hook.create(0x0502CB0, &client_ui_stub);
         }
     };
 }
