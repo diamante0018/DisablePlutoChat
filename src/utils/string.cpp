@@ -177,13 +177,13 @@ namespace utils::string
 		return str;
 	}
 	
-	bool isClean(const std::string& str)
+	bool is_clean(const std::string& str)
 	{
-		const static std::string allowedChars = ("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM' _.1234567890,:;^=-+*[]~{}&%()<>$|/#!?");
+		const static std::string allowed_chars = ("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM' _.1234567890,:;^=-+*[]~{}&%()<>$|/#!?");
 
 		return std::none_of(str.cbegin(), str.cend(), [](const auto c)
 			{
-				return allowedChars.find(c) == std::string::npos;
+				return allowed_chars.find(c) == std::string::npos;
 			});
 	}
 

@@ -98,6 +98,6 @@ namespace utils::string
 
 	std::string replace(std::string str, const std::string& from, const std::string& to);
 
-	bool isClean(const std::string& str);
+	bool is_clean(const std::string& str);
 	bool contains(const std::string& str1, const std::string& str2);
 }
