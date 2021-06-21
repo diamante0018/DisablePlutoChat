@@ -2,8 +2,6 @@
 
 #include "loader/component_loader.hpp"
 #include "utils/string.hpp"
-#include "game/game.hpp"
-#include "game/structs.hpp"
 
 #include "command.hpp"
 

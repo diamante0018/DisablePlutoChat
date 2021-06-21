@@ -16,3 +16,6 @@
 #include <csetjmp>
 
 using namespace std::literals;
+
+#include "game/structs.hpp"
+#include "game/game.hpp"

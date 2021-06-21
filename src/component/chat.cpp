@@ -3,7 +3,6 @@
 #include "loader/component_loader.hpp"
 #include "utils/hook.hpp"
 #include "utils/string.hpp"
-#include "game/game.hpp"
 
 #include "chat.hpp"
 

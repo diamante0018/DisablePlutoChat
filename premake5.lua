@@ -89,9 +89,6 @@ project "pluto-disable-chat"
 kind "SharedLib"
 language "C++"
 
-pchheader "stdinc.hpp"
-pchsource "src/stdinc.cpp"
-
 files {"./src/**.hpp", "./src/**.cpp"}
 
 includedirs {"src"}
