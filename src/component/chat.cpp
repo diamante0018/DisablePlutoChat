@@ -12,12 +12,23 @@ namespace chat
     {
         utils::hook::detour client_ui_hook;
 
+        void Dvar_RegisterInt(const std::string& name, const int value, const int min, const int max,
+            const unsigned short flags,
+            const std::string& description)
+        {
+            game::Cbuf_AddText(0, utils::string::va("Registering int dvar %s %d\n", name.data(), value));
+            game::Dvar_RegisterInt(name.data(), value, min, max, flags, description.data());
+        }
+
         void client_ui_stub(int entRef, const char* command)
         {
-            const char* debug = utils::string::va("Client: %d sent command: %s\n", entRef, command);
-            game::Cbuf_AddText(0, debug);
-
-            if (utils::string::starts_with(command, "say")) return;
+            const auto chatDvar = game::Dvar_FindVar("sv_disableChat");
+            if (utils::string::starts_with(command, "say") && chatDvar->current.integer == 1)
+            {
+                const char* debug = utils::string::va("tell %d You are not allowed to type in the chat", entRef);
+                game::Cbuf_AddText(0, debug);
+                return;
+            }
 
             client_ui_hook.invoke<void>(entRef, command);
         }
@@ -28,6 +39,7 @@ namespace chat
     public:
         void post_unpack() override
         {
+            Dvar_RegisterInt("sv_disableChat", 1, 0, 1, 0, "Disables game chat");
             client_ui_hook.create(0x0502CB0, &client_ui_stub);
         }
     };
