@@ -22,8 +22,7 @@ namespace chat
 
         void client_ui_stub(int entRef, const char* command)
         {
-            const auto chatDvar = game::Dvar_FindVar("sv_disableChat");
-            if (utils::string::starts_with(command, "say") && chatDvar->current.integer == 1)
+            if (utils::string::starts_with(command, "say"))
             {
                 const char* debug = utils::string::va("tell %d You are not allowed to type in the chat", entRef);
                 game::Cbuf_AddText(0, debug);
@@ -39,7 +38,6 @@ namespace chat
     public:
         void post_unpack() override
         {
-            Dvar_RegisterInt("sv_disableChat", 1, 0, 1, 0, "Disables game chat");
             client_ui_hook.create(0x0502CB0, &client_ui_stub);
         }
     };
