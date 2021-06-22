@@ -21,11 +21,11 @@ namespace game
 	WEAK symbol<const char*(int index)> Cmd_Argv{0x467600};
 
 	WEAK symbol<const dvar_t*(const char*)> Dvar_FindVar{0x5BDCC0};
-	WEAK symbol<dvar_t*(const char* dvarName, int value, int min, int max, unsigned short flags, const char* desc)>
+	WEAK symbol<const dvar_t*(const char* dvarName, int value, int min, int max, unsigned short flags, const char* desc)>
 		Dvar_RegisterInt{0x05BEA40};
-	WEAK symbol<dvar_t*(const char* dvarName, bool value, unsigned short flags, const char* description)>
+	WEAK symbol<const dvar_t*(const char* dvarName, bool value, unsigned short flags, const char* description)>
 		Dvar_RegisterBool{0x05BE9F0};
-	WEAK symbol<dvar_t*(const char* dvarName, const char* value, unsigned short flags, const char* description)>
+	WEAK symbol<const dvar_t*(const char* dvarName, const char* value, unsigned short flags, const char* description)>
 		Dvar_RegisterString{0x05BEC90};
 
 	WEAK symbol<char*(const char*)> I_CleanStr{0x0};
