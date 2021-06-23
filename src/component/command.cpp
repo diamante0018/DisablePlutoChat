@@ -98,6 +98,7 @@ namespace command
 		{
 			add_commands_generic();
 		}
+
 	private:
 		static void add_commands_generic()
 		{
