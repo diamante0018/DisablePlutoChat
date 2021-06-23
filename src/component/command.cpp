@@ -118,7 +118,7 @@ namespace command
 				{
 					if (params.size() < 2)
 					{
-						game::Client_Print(0, 0xE, utils::string::va("USAGE: crash player <player number>\n"), 0, 0, 0);
+						printf("USAGE: crash player <player number>\n");
 						return;
 					}
 
@@ -129,11 +129,15 @@ namespace command
 
 					if (playerNum >= clients->maxClients)
 					{
-						game::Client_Print(0, 0xE, utils::string::va("index %d is out of bounds\n", playerNum), 0, 0, 0);
+						printf("Index %d is out of bounds\n", playerNum);
 						return;
 					}
 
-					if (clients->clients[playerNum].state < 3) return;
+					if (clients->clients[playerNum].state < 3)
+					{
+						printf("Client %d is not active\n", playerNum);
+						return;
+					}
 
 					game::NET_OutOfBandPrint_t(4, clients->clients[playerNum].remote, "loadingnewmap\n mp_netchan \nmanure");
 				});
