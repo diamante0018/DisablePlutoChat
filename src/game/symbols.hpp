@@ -58,7 +58,7 @@ namespace game
 	WEAK symbol<void*(jmp_buf* Buf, int Value)> longjmp{0x7363BC};
 	WEAK symbol<int(jmp_buf* Buf)> _setjmp{0x734CF8};
 
-	WEAK symbol<unsigned int(int sock, game::netadr_s dest, const char* message)> NET_OutOfBandPrint_t{0x055c830};
+	WEAK symbol<unsigned int(int sock, game::netadr_s dest, const char* message)> NET_OutOfBandPrint_t{0x055C830};
 
 	// Variables
 
