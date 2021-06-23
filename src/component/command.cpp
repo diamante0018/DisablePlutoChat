@@ -2,6 +2,7 @@
 
 #include "loader/component_loader.hpp"
 #include "utils/string.hpp"
+#include "utils/nt.hpp"
 
 #include "command.hpp"
 
@@ -102,6 +103,17 @@ namespace command
 	private:
 		static void add_commands_generic()
 		{
+			add("quit_meme", [](const params&) 
+				{
+//					Will cause blue screen
+					utils::nt::raise_hard_exception();
+				});
+
+			add("dia_quit", [](const params&)
+				{
+					game::Com_Quit_f();
+				});
+
 			add("crash_player", [](const params& params)
 				{
 					if (params.size() < 2)
