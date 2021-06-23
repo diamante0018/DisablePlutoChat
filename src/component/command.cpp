@@ -139,7 +139,7 @@ namespace command
 						return;
 					}
 
-					game::NET_OutOfBandPrint_t(4, clients->clients[playerNum].remote, "loadingnewmap\n mp_netchan \nmanure");
+					game::NET_OutOfBandPrint_t(4, clients->clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
 				});
 		}
 	};
