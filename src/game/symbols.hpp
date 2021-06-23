@@ -16,6 +16,7 @@ namespace game
 
 	WEAK symbol<const char*(int index)> ConcatArgs{0x502150};
 	WEAK symbol<void(int localClientNum, const char* text)> Cbuf_AddText{0x545680};
+	WEAK symbol<void(int localClientNum, int a2, const char* message, int a4, int a5, int a6)> Client_Print{0x0487B00};
 	WEAK symbol<void(const char* cmdName, void(), cmd_function_t* allocedCmd)> Cmd_AddCommandInternal{0x545DF0};
 	WEAK symbol<void(const char* cmdName)> Cmd_RemoveCommand{0x545E20};
 	WEAK symbol<const char*(int index)> Cmd_Argv{0x467600};
@@ -56,6 +57,8 @@ namespace game
 
 	WEAK symbol<void*(jmp_buf* Buf, int Value)> longjmp{0x7363BC};
 	WEAK symbol<int(jmp_buf* Buf)> _setjmp{0x734CF8};
+
+	WEAK symbol<unsigned int(int sock, game::netadr_s dest, const char* message)> NET_OutOfBandPrint_t{0x055c830};
 
 	// Variables
 

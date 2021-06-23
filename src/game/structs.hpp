@@ -26,6 +26,26 @@ namespace game
 		const char** argv[8];
 	};
 
+	enum netadrtype_t : std::uint32_t
+	{
+		NA_BOT = 0x0,
+		NA_BAD = 0x1,
+		NA_LOOPBACK = 0x2,
+		NA_BROADCAST = 0x3,
+		NA_IP = 0x4,
+	};
+
+	struct netadr_s
+	{
+		netadrtype_t type;
+		unsigned char ip[4];
+		uint16_t port;
+		uint16_t field_A;
+		uint32_t field_C;
+		uint32_t field_10;
+		uint32_t index;
+	};
+
 	struct msg_t
 	{
 		int overflowed;
@@ -317,5 +337,33 @@ namespace game
 		char __pad1[0x28];
 		int flags;
 		char __pad2[0xEC];
+	};
+
+	enum clientState_t : std::int32_t
+	{
+		CS_FREE = 0,
+		CS_ZOMBIE = 1,
+		CS_UNKNOWN = 2,
+		CS_CONNECTED = 3,
+		CS_PRIMED = 4,
+		CS_ACTIVE = 5
+	};
+
+#pragma pack(push, 1)
+	struct client_s
+	{
+		clientState_t state;
+		char __pad0[0x24];
+		netadr_s remote;
+		char __pad1[0x1E166];
+	};
+
+	static_assert(sizeof(client_s) == 0x1E1A6);
+#pragma pack(pop)
+
+	struct sv_clients_t
+	{
+		int maxClients;
+		client_s clients[18];
 	};
 }

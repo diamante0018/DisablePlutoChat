@@ -49,6 +49,8 @@ targetname "%{prj.name}"
 
 configurations {"Debug", "Release"}
 
+language "C++"
+
 architecture "x86"
 platforms "x86"
 

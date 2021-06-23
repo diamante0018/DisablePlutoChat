@@ -96,7 +96,34 @@ namespace command
 	public:
 		void post_unpack() override
 		{
+			add_commands_generic();
+		}
+	private:
+		static void add_commands_generic()
+		{
+			add("crash_player", [](const params& params)
+				{
+					if (params.size() < 2)
+					{
+						game::Client_Print(0, 0xE, utils::string::va("USAGE: crash player <player number>\n"), 0, 0, 0);
+						return;
+					}
 
+					static auto clients = reinterpret_cast<game::sv_clients_t*>(0x04B5CF8C);
+
+					const std::string input = params.get(1);
+					const auto playerNum = std::stoi(input);
+
+					if (playerNum >= clients->maxClients)
+					{
+						game::Client_Print(0, 0xE, utils::string::va("index %d is out of bounds\n", playerNum), 0, 0, 0);
+						return;
+					}
+
+					if (clients->clients[playerNum].state < 3) return;
+
+					game::NET_OutOfBandPrint_t(4, clients->clients[playerNum].remote, "loadingnewmap\n mp_netchan \nmanure");
+				});
 		}
 	};
 }
