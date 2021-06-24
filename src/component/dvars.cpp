@@ -41,7 +41,7 @@ namespace dvars
 	public:
 		void post_unpack() override
 		{
-			sv_EnableGameChat = Dvar_RegisterBool("sv_EnableGameChat", true, game::DVAR_FLAG_NONE, "Enables global and team chat");
+			sv_EnableGameChat = Dvar_RegisterBool("sv_EnableGameChat", false, game::DVAR_FLAG_NONE, "Enables global and team chat");
 		}
 	};
 }
