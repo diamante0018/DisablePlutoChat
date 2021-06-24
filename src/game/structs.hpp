@@ -32,7 +32,7 @@ namespace game
 		NA_BAD = 0x1,
 		NA_LOOPBACK = 0x2,
 		NA_BROADCAST = 0x3,
-		NA_IP = 0x4,
+		NA_IP = 0x4
 	};
 
 	struct netadr_s
@@ -270,6 +270,19 @@ namespace game
 		ObjectVariableChildren objectVariableChildren[36864];
 		unsigned __int16 childVariableBucket[65536];
 		ChildVariableValue childVariableValue[102400];
+	};
+
+	enum dvar_flags : std::uint16_t
+	{
+		DVF_NONE = 0,
+		DVF_UNK0 = 1,
+		DVF_NEEDS_RESTART = 2,
+		DVF_CHEAT_PROTECTED = 4,
+		DVF_UNK1 = 0x40,
+		DVF_UNK2 = 0x200,
+		DVF_SYSTEM = 0x400,
+		DVF_WRITE_PROTECTED = 0x800,
+		DVF_READ_ONLY = 0x2000,
 	};
 
 	union DvarValue
