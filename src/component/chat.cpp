@@ -5,6 +5,7 @@
 #include "utils/string.hpp"
 
 #include "chat.hpp"
+#include "dvars.hpp"
 
 namespace chat
 {
@@ -14,9 +15,7 @@ namespace chat
 
         void client_ui_stub(int entRef, const char* command)
         {
-            auto dvar = game::Dvar_FindVar("sv_EnableGameChat");
-
-            if (utils::string::starts_with(command, "say") && !dvar->current.enabled)
+            if (utils::string::starts_with(command, "say") && !dvars::sv_EnableGameChat->current.enabled)
             {
                 const char* debug = utils::string::va("tell %d You are not allowed to type in the chat", entRef);
                 game::Cbuf_AddText(0, debug);

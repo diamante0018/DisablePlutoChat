@@ -8,6 +8,8 @@
 
 namespace dvars
 {
+	game::dvar_t* sv_EnableGameChat;
+
 	game::dvar_t* Dvar_RegisterBool(const std::string &name, const bool value, const unsigned short flags,
 						   const std::string &description)
 	{
@@ -39,7 +41,7 @@ namespace dvars
 	public:
 		void post_unpack() override
 		{
-			Dvar_RegisterBool("sv_EnableGameChat", true, game::DVF_NONE, "Enables global and team chat");
+			sv_EnableGameChat = Dvar_RegisterBool("sv_EnableGameChat", true, game::DVF_NONE, "Enables global and team chat");
 		}
 	};
 }
