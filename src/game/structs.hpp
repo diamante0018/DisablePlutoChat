@@ -368,10 +368,10 @@ namespace game
 		clientState_t state;
 		char __pad0[0x24];
 		netadr_s remote;
-		char __pad1[0x1E166];
+		char __pad1[0x78658];
 	};
 
-	static_assert(sizeof(client_s) == 0x1E1A6);
+	static_assert(sizeof(client_s) == 0x78698);
 #pragma pack(pop)
 
 	struct sv_clients_t
