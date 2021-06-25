@@ -374,7 +374,7 @@ namespace game
 	static_assert(sizeof(client_s) == 0x78698);
 #pragma pack(pop)
 
-	struct sv_clients_t
+	struct sv_clients
 	{
 		int maxClients;
 		client_s clients[18];

@@ -122,7 +122,7 @@ namespace command
 						return;
 					}
 
-					static auto clients = reinterpret_cast<game::sv_clients_t*>(0x04B5CF8C);
+					static auto clients = reinterpret_cast<game::sv_clients*>(0x04B5CF8C);
 
 					const std::string input = params.get(1);
 					const auto playerNum = std::stoi(input);
