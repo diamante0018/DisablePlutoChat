@@ -1,10 +1,10 @@
 #include <stdinc.hpp>
+
 #include "loader/component_loader.hpp"
-#include "dvars.hpp"
-
-#include "game/game.hpp"
-
 #include <utils/hook.hpp>
+
+#include "dvars.hpp"
+#include "game/game.hpp"
 
 namespace dvars
 {
@@ -27,13 +27,13 @@ namespace dvars
 						const unsigned short flags,
 						const std::string &description)
 	{
-		game::Dvar_RegisterInt(name.data(), value, min, max, flags, description.data());
+		return game::Dvar_RegisterInt(name.data(), value, min, max, flags, description.data());
 	}
 
 	game::dvar_t* Dvar_RegisterString(const std::string &name, const std::string &value, const unsigned short flags,
 						const std::string &description)
 	{
-		game::Dvar_RegisterString(name.data(), value.data(), flags, description.data());
+		return game::Dvar_RegisterString(name.data(), value.data(), flags, description.data());
 	}
 
 	class component final : public component_interface
