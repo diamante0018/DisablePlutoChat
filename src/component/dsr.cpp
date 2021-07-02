@@ -39,6 +39,12 @@ namespace dsr
             open_dsr_hook.create(0x06BB470, &open_DSR_stub);
             save_dsr_hook.create(0x06BB4F0, &save_DSR_stub);
         }
+
+        void pre_destroy() override
+        {
+            open_dsr_hook.clear();
+            save_dsr_hook.clear();
+        }
     };
 }
 

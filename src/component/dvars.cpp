@@ -189,6 +189,14 @@ namespace dvars
 
 			sv_EnableGameChat = game::Dvar_RegisterBool("sv_EnableGameChat", true, game::DVAR_FLAG_NONE, "Enables global and team chat");
 		}
+
+		void pre_destroy() override
+		{
+			dvar_register_bool_hook.clear();
+			dvar_register_float_hook.clear();
+			dvar_register_int_hook.clear();
+			dvar_register_string_hook.clear();
+		}
 	};
 }
 

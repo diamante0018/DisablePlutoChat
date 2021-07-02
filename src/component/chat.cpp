@@ -35,6 +35,7 @@ namespace chat
         void pre_destroy() override
         {
             mute_list.clear();
+            client_ui_hook.clear();
         }
     };
 }
