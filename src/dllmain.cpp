@@ -11,5 +11,10 @@ BOOL APIENTRY DllMain(HMODULE /*hModule*/,
         component_loader::post_unpack();
     }
 
+    else if (ul_reason_for_call == DLL_PROCESS_DETACH)
+    {
+        component_loader::pre_destroy();
+    }
+
     return TRUE;
 }

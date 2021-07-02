@@ -31,6 +31,11 @@ namespace chat
         {
             client_ui_hook.create(0x0502CB0, &client_ui_stub);
         }
+
+        void pre_destroy() override
+        {
+            mute_list.clear();
+        }
     };
 }
 
