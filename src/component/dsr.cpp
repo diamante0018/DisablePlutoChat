@@ -17,7 +17,7 @@ namespace dsr
         bool open_DSR_stub(const char *dsr_name)
         {
             printf("Loading %s.dsr\n", dsr_name);
-            dvars::Dvar_RegisterString("sv_dsr", dsr_name, game::DVAR_FLAG_NONE, "Last DSR opened by the game");
+            game::Dvar_RegisterString("sv_dsr", dsr_name, game::DVAR_FLAG_NONE, "Last DSR opened by the game");
 
             return open_dsr_hook.invoke<bool>(dsr_name);
         }
@@ -25,7 +25,7 @@ namespace dsr
         bool save_DSR_stub(void* a1, const char* dsr_name)
         {
             printf("Saving %s.dsr\n", dsr_name);
-            dvars::Dvar_RegisterString("sv_saved_dsr", dsr_name, game::DVAR_FLAG_NONE, "Last DSR saved by the game");
+            game::Dvar_RegisterString("sv_saved_dsr", dsr_name, game::DVAR_FLAG_NONE, "Last DSR saved by the game");
 
             return save_dsr_hook.invoke<bool>(a1, dsr_name);
         }

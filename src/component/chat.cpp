@@ -9,21 +9,19 @@
 
 namespace chat
 {
-    namespace
+    utils::hook::detour client_ui_hook;
+    std::unordered_set<int> mute_list;
+
+    void client_ui_stub(int entRef, const char* command)
     {
-        utils::hook::detour client_ui_hook;
-
-        void client_ui_stub(int entRef, const char* command)
+        if (utils::string::starts_with(command, "say") && (!dvars::sv_EnableGameChat->current.enabled || mute_list.contains(entRef)))
         {
-            if (utils::string::starts_with(command, "say") && !dvars::sv_EnableGameChat->current.enabled)
-            {
-                const char* debug = utils::string::va("tell %d You are not allowed to type in the chat", entRef);
-                game::Cbuf_AddText(0, debug);
-                return;
-            }
-
-            client_ui_hook.invoke<void>(entRef, command);
+            auto* debug = utils::string::va("tell %d You are not allowed to type in the chat", entRef);
+            game::Cbuf_AddText(0, debug);
+            return;
         }
+
+        client_ui_hook.invoke<void>(entRef, command);
     }
 
     class component final : public component_interface

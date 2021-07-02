@@ -5,6 +5,7 @@
 #include "utils/nt.hpp"
 
 #include "command.hpp"
+#include "chat.hpp"
 
 namespace command
 {
@@ -140,6 +141,58 @@ namespace command
 					}
 
 					game::NET_OutOfBandPrint_t(4, clients->clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
+				});
+
+			add("mute_player", [](const params& params)
+				{
+					if (params.size() < 2)
+					{
+						printf("USAGE: mute player <player number>\n");
+						return;
+					}
+
+					const std::string input = params.get(1);
+					const auto playerNum = std::stoi(input);
+
+					if (playerNum > 17)
+					{
+						printf("Client number %d is out of bounds\n", playerNum);
+						return;
+					}
+
+					if (chat::mute_list.contains(playerNum))
+					{
+						printf("Client number %d is already muted\n", playerNum);
+						return;
+					}
+
+					chat::mute_list.insert(playerNum);
+				});
+
+			add("unmute_player", [](const params& params)
+				{
+					if (params.size() < 2)
+					{
+						printf("USAGE: unmute player <player number>\n");
+						return;
+					}
+
+					const std::string input = params.get(1);
+					const auto playerNum = std::stoi(input);
+
+					if (playerNum > 17)
+					{
+						printf("Client number %d is out of bounds\n", playerNum);
+						return;
+					}
+
+					if (!chat::mute_list.contains(playerNum))
+					{
+						printf("Client number %d is not muted\n", playerNum);
+						return;
+					}
+
+					chat::mute_list.erase(playerNum);
 				});
 		}
 	};
