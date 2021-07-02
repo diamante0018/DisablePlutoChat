@@ -194,6 +194,34 @@ namespace command
 
 					chat::mute_list.erase(playerNum);
 				});
+
+			add("say_as_player", [](const params& params)
+				{
+					if (params.size() < 3)
+					{
+						printf("USAGE: say as player <player number> <message>\n");
+						return;
+					}
+
+					const std::string input = params.get(1);
+					const auto playerNum = std::stoi(input);
+
+					if (playerNum > 17)
+					{
+						printf("Client number %d is out of bounds\n", playerNum);
+						return;
+					}
+
+					std::string message{};
+					for (int i = 2; i < params.size(); i++)
+					{
+						message.append(" ");
+						message.append(params.get(i));
+					}
+
+					auto* player = &game::g_entities[playerNum];
+					game::Cmd_Say_f(player, 0, 0, message.data());
+				});
 		}
 	};
 }
