@@ -215,8 +215,8 @@ namespace command
 					std::string message{};
 					for (int i = 2; i < params.size(); i++)
 					{
-						message.append(" ");
 						message.append(params.get(i));
+						message.append(" ");
 					}
 
 					auto* player = &game::g_entities[playerNum];
