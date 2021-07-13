@@ -30,6 +30,7 @@ namespace game
 		Dvar_RegisterString{0x05BEC90};
 	WEAK symbol<dvar_t*(const char* dvarName, float value, float min, float max, unsigned short flags, const char* description)>
 		Dvar_RegisterFloat{0x05BEA80};
+	WEAK symbol<void(const char* name, const char* value)> Dvar_SetStringByName{0x05BF660};
 
 	WEAK symbol<const char*(const char* s, const char* key)> Info_ValueForKey{0x05C2DB0};
 	WEAK symbol<void(char* s, const char* key)> Info_RemoveKey{0x05C2F50};
