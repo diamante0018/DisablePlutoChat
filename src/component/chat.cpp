@@ -12,7 +12,7 @@ namespace chat
     utils::hook::detour client_ui_hook;
     std::unordered_set<std::int32_t> mute_list;
 
-    void client_ui_stub(int clientNum)
+    void client_command_stub(int clientNum)
     {
         char cmd[1024] = {0};
         game::gentity_s* ent = game::g_entities + clientNum;
@@ -47,7 +47,7 @@ namespace chat
     public:
         void post_unpack() override
         {
-            client_ui_hook.create(0x0502CB0, &client_ui_stub);
+            client_ui_hook.create(0x0502CB0, &client_command_stub);
         }
 
         void pre_destroy() override
