@@ -9,7 +9,7 @@
 
 namespace chat
 {
-    utils::hook::detour client_ui_hook;
+    utils::hook::detour client_command_hook;
     std::unordered_set<std::int32_t> mute_list;
 
     void client_command_stub(int clientNum)
@@ -39,7 +39,7 @@ namespace chat
             return;
         }
 
-        client_ui_hook.invoke<void>(clientNum);
+        client_command_hook.invoke<void>(clientNum);
     }
 
     class component final : public component_interface
@@ -47,13 +47,13 @@ namespace chat
     public:
         void post_unpack() override
         {
-            client_ui_hook.create(0x0502CB0, &client_command_stub);
+            client_command_hook.create(0x0502CB0, &client_command_stub);
         }
 
         void pre_destroy() override
         {
             mute_list.clear();
-            client_ui_hook.clear();
+            client_command_hook.clear();
         }
     };
 }
