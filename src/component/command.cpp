@@ -222,6 +222,18 @@ namespace command
 					auto* player = &game::g_entities[playerNum];
 					game::Cmd_Say_f(player, 0, 0, message.data());
 				});
+
+			add("arena_test", [](const params& params)
+				{
+					if (params.size() < 2)
+					{
+						printf("USAGE: arena test <map name>\n");
+						return;
+					}
+
+					game::Dvar_SetStringByName("g_gametype", "arena");
+					game::Cbuf_AddText(0, utils::string::va("wait ; wait ; map %s\n", params.get(1)));
+				});
 		}
 	};
 }

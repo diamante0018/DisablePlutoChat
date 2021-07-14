@@ -83,22 +83,6 @@ namespace utils::hook
 		return this->original_;
 	}
 
-	bool iat(const nt::library& library, const std::string& target_library, const std::string& process, void* stub)
-	{
-		if (!library.is_valid()) return false;
-
-		auto* const ptr = library.get_iat_entry(target_library, process);
-		if (!ptr) return false;
-
-		DWORD protect;
-		VirtualProtect(ptr, sizeof(*ptr), PAGE_EXECUTE_READWRITE, &protect);
-
-		*ptr = stub;
-
-		VirtualProtect(ptr, sizeof(*ptr), protect, &protect);
-		return true;
-	}
-
 	void nop(void* place, const size_t length)
 	{
 		DWORD old_protect{};
@@ -160,64 +144,38 @@ namespace utils::hook
 		return call(pointer, reinterpret_cast<void*>(data));
 	}
 
-	void jump(void* pointer, void* data, const bool use_far)
+	void set(std::uintptr_t address, std::vector<std::uint8_t>&& bytes)
 	{
-		static const unsigned char jump_data[] = {
-			0x48, 0xb8, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0xff, 0xe0
-		};
+		DWORD oldProtect = 0;
 
-		if (!use_far && is_relatively_far(pointer, data))
-		{
-			throw std::runtime_error("Too far away to create 32bit relative branch");
-		}
-
-		auto* patch_pointer = PBYTE(pointer);
-
-		if (use_far)
-		{
-			copy(patch_pointer, jump_data, sizeof(jump_data));
-			copy(patch_pointer + 2, &data, sizeof(data));
-		}
-		else
-		{
-			set<uint8_t>(patch_pointer, 0xE9);
-			set<int32_t>(patch_pointer + 1, int32_t(size_t(data) - (size_t(pointer) + 5)));
-		}
+		auto* place = reinterpret_cast<void*>(address);
+		VirtualProtect(place, bytes.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
+		memcpy(place, bytes.data(), bytes.size());
+		VirtualProtect(place, bytes.size(), oldProtect, &oldProtect);
+		FlushInstructionCache(GetCurrentProcess(), place, bytes.size());
 	}
 
-	void jump(const size_t pointer, void* data, const bool use_far)
+	void set(std::uintptr_t address, void* buffer, size_t size)
 	{
-		return jump(reinterpret_cast<void*>(pointer), data, use_far);
+		DWORD oldProtect = 0;
+
+		auto* place = reinterpret_cast<void*>(address);
+		VirtualProtect(place, size, PAGE_EXECUTE_READWRITE, &oldProtect);
+		memcpy(place, buffer, size);
+		VirtualProtect(place, size, oldProtect, &oldProtect);
+		FlushInstructionCache(GetCurrentProcess(), place, size);
 	}
 
-	void jump(const size_t pointer, const size_t data, const bool use_far)
+	void jump(std::uintptr_t address, void* destination)
 	{
-		return jump(pointer, reinterpret_cast<void*>(data), use_far);
-	}
+		if (!address) return;
 
-	void inject(void* pointer, const void* data)
-	{
-		if (is_relatively_far(pointer, data, 4))
-		{
-			throw std::runtime_error("Too far away to create 32bit relative branch");
-		}
+		std::uint8_t* bytes = new std::uint8_t[5];
+		*bytes = 0xE9;
+		*reinterpret_cast<std::uint32_t*>(bytes + 1) = CalculateRelativeJMPAddress(address, destination);
 
-		set<int32_t>(pointer, int32_t(size_t(data) - (size_t(pointer) + 4)));
-	}
+		set(address, bytes, 5);
 
-	void inject(const size_t pointer, const void* data)
-	{
-		return inject(reinterpret_cast<void*>(pointer), data);
-	}
-
-	void* follow_branch(void* address)
-	{
-		auto* const data = static_cast<uint8_t*>(address);
-		if (*data != 0xE8 && *data != 0xE9)
-		{
-			throw std::runtime_error("No branch instruction found");
-		}
-
-		return extract<void*>(data + 1);
+		delete[] bytes;
 	}
 }

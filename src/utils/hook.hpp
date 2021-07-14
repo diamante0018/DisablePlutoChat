@@ -1,6 +1,8 @@
 #pragma once
 #include "signature.hpp"
 
+#define CalculateRelativeJMPAddress(X, Y) (((std::uintptr_t)Y - (std::uintptr_t)X) - 5)
+
 namespace utils::hook
 {
 	class detour
@@ -16,7 +18,7 @@ namespace utils::hook
 			this->operator=(std::move(other));
 		}
 
-		detour& operator=(detour&& other) noexcept
+		detour& operator= (detour&& other) noexcept
 		{
 			if (this != &other)
 			{
@@ -33,7 +35,7 @@ namespace utils::hook
 		}
 
 		detour(const detour&) = delete;
-		detour& operator=(const detour&) = delete;
+		detour& operator= (const detour&) = delete;
 
 		void enable() const;
 		void disable() const;
@@ -49,7 +51,7 @@ namespace utils::hook
 		}
 
 		template <typename T, typename... Args>
-		T invoke(Args ... args)
+		T invoke(Args... args)
 		{
 			return static_cast<T(*)(Args ...)>(this->get_original())(args...);
 		}
@@ -60,8 +62,6 @@ namespace utils::hook
 		void* place_{};
 		void* original_{};
 	};
-
-	bool iat(const nt::library& library, const std::string& target_library, const std::string& process, void* stub);
 
 	void nop(void* place, size_t length);
 	void nop(size_t place, size_t length);
@@ -75,22 +75,15 @@ namespace utils::hook
 	void call(size_t pointer, void* data);
 	void call(size_t pointer, size_t data);
 
-	void jump(void* pointer, void* data, bool use_far = false);
-	void jump(size_t pointer, void* data, bool use_far = false);
-	void jump(size_t pointer, size_t data, bool use_far = false);
-
-	void inject(void* pointer, const void* data);
-	void inject(size_t pointer, const void* data);
+	void jump(std::uintptr_t address, void* destination);
 
 	template <typename T>
 	T extract(void* address)
 	{
-		auto* const data = static_cast<uint8_t*>(address);
+		const auto data = static_cast<uint8_t*>(address);
 		const auto offset = *reinterpret_cast<int32_t*>(data);
 		return reinterpret_cast<T>(data + offset + 4);
 	}
-
-	void* follow_branch(void* address);
 
 	template <typename T>
 	static void set(void* place, T value)
