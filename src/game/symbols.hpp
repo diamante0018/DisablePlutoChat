@@ -70,6 +70,8 @@ namespace game
 	WEAK symbol<unsigned int(int sock, game::netadr_s dest, const char* message)> NET_OutOfBandPrint_t{0x055C830};
 	WEAK symbol<void(game::gentity_s* ent, int a2, int which_chat, const char* message)> Cmd_Say_f{0x0502B60};
 	WEAK symbol<void()> Com_Quit_f{0x05556B0};
+	WEAK symbol<void(int index, char* buffer, int bufferSize)> SV_GetUserinfo{0x0573E00};
+	WEAK symbol<bool(const char* s)> Info_Validate{0x05C3140};
 
 	// Variables
 

@@ -271,6 +271,41 @@ namespace command
 					game::SV_GameSendServerCommand(playerNum, 0, "u _ 0 1337");
 					game::SV_GameSendServerCommand(playerNum, 0, "c \"^1Hello there!\"");
 				});
+
+			add("dump_user_info", [](const params& params)
+				{
+					if (params.size() < 2)
+					{
+						printf("USAGE: dump user info <player number>\n");
+						return;
+					}
+
+					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
+					const std::string input = params.get(1);
+					const auto playerNum = std::stoi(input);
+
+					if (playerNum >= svs_max_clients)
+					{
+						printf("Index %d is out of bounds\n", playerNum);
+						return;
+					}
+
+					if (game::svs_clients[playerNum].state < 3)
+					{
+						printf("Client %d is not active\n", playerNum);
+						return;
+					}
+
+					char userinfo[4096] = {0};
+					game::SV_GetUserinfo(playerNum, userinfo, sizeof(userinfo));
+
+					if (!game::Info_Validate(userinfo))
+					{
+						strncpy_s(userinfo, "\\name\\badinfo", sizeof(userinfo));
+					}
+
+					printf("%s\n", userinfo);
+				});
 		}
 	};
 }
