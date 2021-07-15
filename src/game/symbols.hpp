@@ -87,4 +87,6 @@ namespace game
 	WEAK symbol<gentity_s> g_entities{0x1A66E28};
 	WEAK symbol<unsigned int> levelEntityId{0x208E1A4};
 	WEAK symbol<unsigned int> gameEntityId{0x208E1A8};
+
+	WEAK symbol<client_s> svs_clients{0x4B5CF90};
 }

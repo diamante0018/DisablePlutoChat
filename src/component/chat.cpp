@@ -14,7 +14,7 @@ namespace chat
 
     void client_command_stub(int clientNum)
     {
-        char cmd[1024] = {0};
+        char cmd[4096] = {0};
         game::gentity_s* ent = game::g_entities + clientNum;
         if (!ent->client)
         {

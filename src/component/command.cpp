@@ -123,24 +123,23 @@ namespace command
 						return;
 					}
 
-					static auto clients = reinterpret_cast<game::sv_clients*>(0x04B5CF8C);
-
+					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
 					const std::string input = params.get(1);
 					const auto playerNum = std::stoi(input);
 
-					if (playerNum >= clients->maxClients)
+					if (playerNum >= svs_max_clients)
 					{
 						printf("Index %d is out of bounds\n", playerNum);
 						return;
 					}
 
-					if (clients->clients[playerNum].state < 3)
+					if (game::svs_clients[playerNum].state < 3)
 					{
 						printf("Client %d is not active\n", playerNum);
 						return;
 					}
 
-					game::NET_OutOfBandPrint_t(4, clients->clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
+					game::NET_OutOfBandPrint_t(4, game::svs_clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
 				});
 
 			add("mute_player", [](const params& params)
@@ -151,10 +150,11 @@ namespace command
 						return;
 					}
 
+					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
 					const std::string input = params.get(1);
 					const auto playerNum = std::stoi(input);
 
-					if (playerNum > 17)
+					if (playerNum >= svs_max_clients)
 					{
 						printf("Client number %d is out of bounds\n", playerNum);
 						return;
@@ -177,10 +177,11 @@ namespace command
 						return;
 					}
 
+					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
 					const std::string input = params.get(1);
 					const auto playerNum = std::stoi(input);
 
-					if (playerNum > 17)
+					if (playerNum >= svs_max_clients)
 					{
 						printf("Client number %d is out of bounds\n", playerNum);
 						return;
@@ -203,12 +204,19 @@ namespace command
 						return;
 					}
 
+					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
 					const std::string input = params.get(1);
 					const auto playerNum = std::stoi(input);
 
-					if (playerNum > 17)
+					if (playerNum >= svs_max_clients)
 					{
 						printf("Client number %d is out of bounds\n", playerNum);
+						return;
+					}
+
+					if (game::svs_clients[playerNum].state < 3)
+					{
+						printf("Client %d is not active\n", playerNum);
 						return;
 					}
 
@@ -233,6 +241,35 @@ namespace command
 
 					game::Dvar_SetStringByName("g_gametype", "arena");
 					game::Cbuf_AddText(0, utils::string::va("wait ; wait ; map %s\n", params.get(1)));
+				});
+
+			add("troll_player", [](const params& params)
+				{
+					if (params.size() < 2)
+					{
+						printf("USAGE: troll player <player number>\n");
+						return;
+					}
+
+					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
+					const std::string input = params.get(1);
+					const auto playerNum = std::stoi(input);
+
+					if (playerNum >= svs_max_clients)
+					{
+						printf("Index %d is out of bounds\n", playerNum);
+						return;
+					}
+
+					if (game::svs_clients[playerNum].state < 3)
+					{
+						printf("Client %d is not active\n", playerNum);
+						return;
+					}
+
+					game::SV_GameSendServerCommand(playerNum, 0, "s 0");
+					game::SV_GameSendServerCommand(playerNum, 0, "u _ 0 1337");
+					game::SV_GameSendServerCommand(playerNum, 0, "c \"^1Hello there!\"");
 				});
 		}
 	};
