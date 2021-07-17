@@ -20,9 +20,6 @@ namespace collision
 			je dontcollide;
 
 			mov eax, dword ptr[esp + 0xa0];
-			jmp collide;
-
-		collide:
 			push 0x05413B6;
 			retn;
 
@@ -51,10 +48,6 @@ namespace collision
 
 			je donteject;
 
-			cmp dword ptr[ebx + 19ch], edi;
-			jle eject;
-
-		eject:
 			push 0x04F9EFA;
 			retn;
 
