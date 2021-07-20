@@ -306,6 +306,28 @@ namespace command
 
 					printf("%s\n", userinfo);
 				});
+
+			add("clean_string", [](const params& params)
+				{
+					if (params.size() < 2)
+					{
+						printf("USAGE: clean string <string>\n");
+						return;
+					}
+
+					char buf[4096] = {0};
+					std::string message{};
+					for (int i = 1; i < params.size(); i++)
+					{
+						message.append(params.get(i));
+						message.append(" ");
+					}
+
+					strncpy_s(buf, message.data(), sizeof(buf));
+					game::Q_CleanStr(buf);
+					printf("%s\n", buf);
+					printf("Original: %s\n", message.data());
+				});
 		}
 	};
 }
