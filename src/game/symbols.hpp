@@ -73,7 +73,7 @@ namespace game
 	WEAK symbol<void(int index, char* buffer, int bufferSize)> SV_GetUserinfo{0x0573E00};
 	WEAK symbol<bool(const char* s)> Info_Validate{0x05C3140};
 	WEAK symbol<void(game::gentity_s*, float* pos, float* orientation)> TeleportPlayer{0x050D840};
-	WEAK symbol<void(char* s1)> Q_CleanStr{0x05C2C60};
+	WEAK symbol<char*(const char* s1)> Q_CleanStr{0x05C2C60};
 
 	// Variables
 

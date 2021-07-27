@@ -27,15 +27,13 @@ namespace chat
         if (utils::string::starts_with(cmd, "die"))
         {
             game::Dvar_SetStringByName("sv_iw4madmin_command", utils::string::va("kill;%d", clientNum));
-            auto* debug = utils::string::va("tell %d You have commited suicide", clientNum);
-            game::Cbuf_AddText(0, debug);
+            game::Cbuf_AddText(0, utils::string::va("tell %d You have commited suicide", clientNum));
             return;
         }
 
         if (utils::string::starts_with(cmd, "say") && (!dvars::sv_EnableGameChat->current.enabled || mute_list.contains(clientNum)))
         {
-            auto* debug = utils::string::va("tell %d You are not allowed to type in the chat", clientNum);
-            game::Cbuf_AddText(0, debug);
+            game::Cbuf_AddText(0, utils::string::va("tell %d You are not allowed to type in the chat", clientNum));
             return;
         }
 
