@@ -27,6 +27,11 @@ namespace zombie
 //              If the player is still connecting after 60 seconds, they will be kicked
                 warn_list.insert(i);
             }
+            else
+            {
+//              If they finally connected the player number should be removed
+                warn_list.erase(i);
+            }
         }
     }
 
