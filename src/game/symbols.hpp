@@ -20,6 +20,8 @@ namespace game
 	WEAK symbol<void(const char* cmdName, void(), cmd_function_t* allocedCmd)> Cmd_AddCommandInternal{0x545DF0};
 	WEAK symbol<void(const char* cmdName)> Cmd_RemoveCommand{0x545E20};
 	WEAK symbol<const char*(int index)> Cmd_Argv{0x467600};
+	WEAK symbol<void()> SV_DisconnectAllClients{0x05749E0};
+	WEAK symbol<void(game::client_s *drop, const char *reason, int notifyOthers)> SV_DropClientInternal{0x0570980};
 
 	WEAK symbol<dvar_t*(const char*)> Dvar_FindVar{0x5BDCC0};
 	WEAK symbol<dvar_t*(const char* dvarName, int value, int min, int max, unsigned short flags, const char* desc)>

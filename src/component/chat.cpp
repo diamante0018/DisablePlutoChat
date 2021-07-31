@@ -10,7 +10,7 @@
 namespace chat
 {
     utils::hook::detour client_command_hook;
-    std::unordered_set<std::int32_t> mute_list;
+    std::unordered_set<std::int32_t> mute_list{};
 
     void client_command_stub(int clientNum)
     {
