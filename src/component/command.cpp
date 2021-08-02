@@ -221,11 +221,7 @@ namespace command
 					}
 
 					std::string message{};
-					for (int i = 2; i < params.size(); i++)
-					{
-						message.append(params.get(i));
-						message.append(" ");
-					}
+					message = params.join(2);
 
 					auto* player = &game::g_entities[playerNum];
 					game::Cmd_Say_f(player, 0, 0, message.data());
@@ -317,11 +313,7 @@ namespace command
 
 					char buf[4096] = {0};
 					std::string message{};
-					for (int i = 1; i < params.size(); i++)
-					{
-						message.append(params.get(i));
-						message.append(" ");
-					}
+					message = params.join(1);
 
 					strncpy_s(buf, message.data(), sizeof(buf));
 					game::Q_CleanStr(buf);
