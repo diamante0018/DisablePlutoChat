@@ -92,7 +92,7 @@ namespace collision
 		{
 			g_playerCollision = game::Dvar_RegisterBool("g_playerCollision", true, game::DVAR_FLAG_NONE, "Flag whether player collision is on or off");
 			g_playerEjection = game::Dvar_RegisterBool("g_playerEjection", true, game::DVAR_FLAG_NONE, "Flag whether player ejection is on or off");
-			sv_enableBounces_plug = game::Dvar_RegisterBool("sv_enableBounces", true, game::DVAR_FLAG_NONE, "Enables bouncing on the server");
+			sv_enableBounces_plug = game::Dvar_RegisterBool("sv_enableBounces_plug", true, game::DVAR_FLAG_NONE, "Enables bouncing on the server");
 
 			utils::hook::jump(0x05413AF, player_collision_stub);
 			utils::hook::jump(0x04F9EF2, player_ejection_stub);
