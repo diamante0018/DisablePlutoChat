@@ -57,6 +57,34 @@ namespace collision
 		}
 	}
 
+	game::dvar_t* sv_enableBounces_plug;
+	__declspec(naked) void bounce_stub()
+	{
+		__asm
+		{
+//			Check the value of sv_enableBounces
+			push eax;
+			mov eax, sv_enableBounces_plug;
+			cmp byte ptr[eax + 12], 1;
+			pop eax;
+
+//			Always bounce if sv_enableBounces is set to 1
+			je bounce;
+
+//			Original code
+			cmp dword ptr[esp + 24h], 0;
+			jnz dontBounce;
+
+		bounce:
+			push 0x0424D58;
+			retn;
+
+		dontBounce:
+			push 0x0424D6C;
+			retn;
+		}
+	}
+
 	class component final : public component_interface
 	{
 	public:
@@ -64,9 +92,11 @@ namespace collision
 		{
 			g_playerCollision = game::Dvar_RegisterBool("g_playerCollision", true, game::DVAR_FLAG_NONE, "Flag whether player collision is on or off");
 			g_playerEjection = game::Dvar_RegisterBool("g_playerEjection", true, game::DVAR_FLAG_NONE, "Flag whether player ejection is on or off");
+			sv_enableBounces_plug = game::Dvar_RegisterBool("sv_enableBounces", true, game::DVAR_FLAG_NONE, "Enables bouncing on the server");
 
 			utils::hook::jump(0x05413AF, player_collision_stub);
 			utils::hook::jump(0x04F9EF2, player_ejection_stub);
+			utils::hook::jump(0x0424D51, bounce_stub);
 		}
 	};
 }
