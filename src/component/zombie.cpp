@@ -15,7 +15,7 @@ namespace zombie
         for (int i = 0; i < max; i++)
         {
             auto* client = &game::svs_clients[i];
-            if (client->state < game::CS_CONNECTED && client->state != game::CS_FREE)
+            if (client->state < game::CS_ACTIVE && client->state != game::CS_FREE)
             {
                 if (warn_list.contains(i))
                 {
