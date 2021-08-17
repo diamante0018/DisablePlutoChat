@@ -25,6 +25,11 @@ namespace melee
             g_allowMelee = game::Dvar_RegisterBool("g_allowMelee", true, game::DVAR_FLAG_NONE, "Allows the usage of the knife");
             fire_melee_hook.create(0x0530DB0, &fire_melee_stub);
         }
+
+        void pre_destroy() override
+        {
+            fire_melee_hook.clear();
+        }
     };
 }
 
