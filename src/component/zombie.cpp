@@ -19,6 +19,7 @@ namespace zombie
             {
                 if (warn_list.contains(i))
                 {
+//                  Might assign the zombie header type to the player for some time before finally removing them
                     game::SV_DropClientInternal(client, "EXE_TRANSMITERROR", 1);
                     warn_list.erase(i);
                     return;

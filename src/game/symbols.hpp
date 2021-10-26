@@ -41,7 +41,7 @@ namespace game
 	WEAK symbol<void(char* s, const char* key)> Info_RemoveKey_Big{0x05C3040};
 	WEAK symbol<void(char* s, const char* key, const char* value)> Info_SetValueForKey{0x05C3170};
 
-	WEAK symbol<char*(const char*)> I_CleanStr{0x0};
+	WEAK symbol<void(const char*)> I_CleanStr{0x05C2C60};
 
 	WEAK symbol<VariableValue(unsigned int classnum, int entnum, int offset)> GetEntityFieldValue{0x56AF20};
 	WEAK symbol<unsigned int(unsigned int parentId, unsigned int name)> FindVariable{0x5651F0};
@@ -76,7 +76,11 @@ namespace game
 	WEAK symbol<void(int index, char* buffer, int bufferSize)> SV_GetUserinfo{0x0573E00};
 	WEAK symbol<bool(const char* s)> Info_Validate{0x05C3140};
 	WEAK symbol<void(game::gentity_s*, float* pos, float* orientation)> TeleportPlayer{0x050D840};
-	WEAK symbol<char*(const char* s1)> Q_CleanStr{0x05C2C60};
+	WEAK symbol<void(const char*, const StringTable**)> StringTable_GetAsset{0x05B87D0};
+	WEAK symbol<int(const StringTable*, int, const char*)> StringTable_LookupRowNumForValue{0x05B8610};
+	WEAK symbol<const char*(const StringTable*, int, int)> StringTable_GetColumnValueForRow{0x05B86A0};
+
+	WEAK symbol<void*(int, const char*, int)> DB_FindXAssetHeader{0x04CA620};
 
 	// Variables
 

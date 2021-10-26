@@ -101,225 +101,111 @@ namespace command
 			add_commands_generic();
 		}
 
+		void pre_destroy() override
+		{
+			clear_script_commands();
+		}
+
 	private:
 		static void add_commands_generic()
 		{
 			add("quit_meme", [](const params&) 
-				{
-//					Will cause blue screen
-					utils::nt::raise_hard_exception();
-				});
+			{
+//				Will cause blue screen
+				utils::nt::raise_hard_exception();
+			});
 
 			add("dia_quit", [](const params&)
-				{
-					game::Com_Quit_f();
-				});
+			{
+				game::Com_Quit_f();
+			});
 
 			add("crash_player", [](const params& params)
+			{
+				if (params.size() < 2)
 				{
-					if (params.size() < 2)
-					{
-						printf("USAGE: crash player <player number>\n");
-						return;
-					}
+					printf("USAGE: crash player <player number>\n");
+					return;
+				}
 
-					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
-					const std::string input = params.get(1);
-					const auto playerNum = std::stoi(input);
+				const std::string input = params.get(1);
+				const auto playerNum = std::stoi(input);
+				auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-					if (playerNum >= svs_max_clients)
-					{
-						printf("Index %d is out of bounds\n", playerNum);
-						return;
-					}
-
-					if (game::svs_clients[playerNum].state < 3)
-					{
-						printf("Client %d is not active\n", playerNum);
-						return;
-					}
-
-					game::NET_OutOfBandPrint_t(4, game::svs_clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
-				});
-
-			add("mute_player", [](const params& params)
+				if (playerNum >= max)
 				{
-					if (params.size() < 2)
-					{
-						printf("USAGE: mute player <player number>\n");
-						return;
-					}
+					printf("Index %d is out of bounds\n", playerNum);
+					return;
+				}
 
-					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
-					const std::string input = params.get(1);
-					const auto playerNum = std::stoi(input);
-
-					if (playerNum >= svs_max_clients)
-					{
-						printf("Client number %d is out of bounds\n", playerNum);
-						return;
-					}
-
-					if (chat::mute_list.contains(playerNum))
-					{
-						printf("Client number %d is already muted\n", playerNum);
-						return;
-					}
-
-					chat::mute_list.insert(playerNum);
-				});
-
-			add("unmute_player", [](const params& params)
+				if (game::svs_clients[playerNum].state < game::CS_CONNECTED)
 				{
-					if (params.size() < 2)
-					{
-						printf("USAGE: unmute player <player number>\n");
-						return;
-					}
+					printf("Client %d is not active\n", playerNum);
+					return;
+				}
 
-					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
-					const std::string input = params.get(1);
-					const auto playerNum = std::stoi(input);
-
-					if (playerNum >= svs_max_clients)
-					{
-						printf("Client number %d is out of bounds\n", playerNum);
-						return;
-					}
-
-					if (!chat::mute_list.contains(playerNum))
-					{
-						printf("Client number %d is not muted\n", playerNum);
-						return;
-					}
-
-					chat::mute_list.erase(playerNum);
-				});
+				game::NET_OutOfBandPrint_t(4, game::svs_clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
+			});
 
 			add("say_as_player", [](const params& params)
+			{
+				if (params.size() < 3)
 				{
-					if (params.size() < 3)
-					{
-						printf("USAGE: say as player <player number> <message>\n");
-						return;
-					}
+					printf("USAGE: say as player <player number> <message>\n");
+					return;
+				}
 
-					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
-					const std::string input = params.get(1);
-					const auto playerNum = std::stoi(input);
+				const std::string input = params.get(1);
+				const auto playerNum = std::stoi(input);
+				auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-					if (playerNum >= svs_max_clients)
-					{
-						printf("Client number %d is out of bounds\n", playerNum);
-						return;
-					}
-
-					if (game::svs_clients[playerNum].state < 3)
-					{
-						printf("Client %d is not active\n", playerNum);
-						return;
-					}
-
-					std::string message{};
-					message = params.join(2);
-
-					auto* player = &game::g_entities[playerNum];
-					game::Cmd_Say_f(player, 0, 0, message.data());
-				});
-
-			add("arena_test", [](const params& params)
+				if (playerNum >= max)
 				{
-					if (params.size() < 2)
-					{
-						printf("USAGE: arena test <map name>\n");
-						return;
-					}
+					printf("Client number %d is out of bounds\n", playerNum);
+					return;
+				}
 
-					game::Dvar_SetStringByName("g_gametype", "arena");
-					game::Cbuf_AddText(0, utils::string::va("wait ; wait ; map %s\n", params.get(1)));
-				});
+				if (game::svs_clients[playerNum].state < game::CS_CONNECTED)
+				{
+					printf("Client %d is not active\n", playerNum);
+					return;
+				}
+
+				std::string message{};
+				message = params.join(2);
+
+				auto* player = &game::g_entities[playerNum];
+				game::Cmd_Say_f(player, 0, 0, message.data());
+			});
 
 			add("troll_player", [](const params& params)
+			{
+				if (params.size() < 2)
 				{
-					if (params.size() < 2)
-					{
-						printf("USAGE: troll player <player number>\n");
-						return;
-					}
+					printf("USAGE: troll player <player number>\n");
+					return;
+				}
 
-					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
-					const std::string input = params.get(1);
-					const auto playerNum = std::stoi(input);
+				const std::string input = params.get(1);
+				const auto playerNum = std::stoi(input);
+				auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-					if (playerNum >= svs_max_clients)
-					{
-						printf("Index %d is out of bounds\n", playerNum);
-						return;
-					}
-
-					if (game::svs_clients[playerNum].state < 3)
-					{
-						printf("Client %d is not active\n", playerNum);
-						return;
-					}
-
-					game::SV_GameSendServerCommand(playerNum, 0, "s 0");
-					game::SV_GameSendServerCommand(playerNum, 0, "u _ 0 1337");
-					game::SV_GameSendServerCommand(playerNum, 0, "c \"^1Hello there!\"");
-				});
-
-			add("dump_user_info", [](const params& params)
+				if (playerNum >= max)
 				{
-					if (params.size() < 2)
-					{
-						printf("USAGE: dump user info <player number>\n");
-						return;
-					}
+					printf("Index %d is out of bounds\n", playerNum);
+					return;
+				}
 
-					auto svs_max_clients = *reinterpret_cast<int*>(0x04B5CF8C);
-					const std::string input = params.get(1);
-					const auto playerNum = std::stoi(input);
-
-					if (playerNum >= svs_max_clients)
-					{
-						printf("Index %d is out of bounds\n", playerNum);
-						return;
-					}
-
-					if (game::svs_clients[playerNum].state < 3)
-					{
-						printf("Client %d is not active\n", playerNum);
-						return;
-					}
-
-					char userinfo[4096] = {0};
-					game::SV_GetUserinfo(playerNum, userinfo, sizeof(userinfo));
-
-					if (!game::Info_Validate(userinfo))
-					{
-						strncpy_s(userinfo, "\\name\\badinfo", sizeof(userinfo));
-					}
-
-					printf("%s\n", userinfo);
-				});
-
-			add("clean_string", [](const params& params)
+				if (game::svs_clients[playerNum].state < game::CS_CONNECTED)
 				{
-					if (params.size() < 2)
-					{
-						printf("USAGE: clean string <string>\n");
-						return;
-					}
+					printf("Client %d is not active\n", playerNum);
+					return;
+				}
 
-					char buf[4096] = {0};
-					std::string message{};
-					message = params.join(1);
-
-					strncpy_s(buf, message.data(), sizeof(buf));
-					game::Q_CleanStr(buf);
-					printf("%s\n", buf);
-					printf("Original: %s\n", message.data());
-				});
+				game::SV_GameSendServerCommand(playerNum, 0, "s 0");
+				game::SV_GameSendServerCommand(playerNum, 0, "u _ 0 1337");
+				game::SV_GameSendServerCommand(playerNum, 0, "c \"^1Hello there!\"");
+			});
 		}
 	};
 }

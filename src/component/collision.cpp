@@ -12,27 +12,27 @@ namespace collision
 	{
 		__asm
 		{
-			push eax;
-			mov eax, g_playerCollision;
-			cmp byte ptr[eax + 12], 0;
-			pop eax;
+			push eax
+			mov eax, g_playerCollision
+			cmp byte ptr[eax + 12], 0
+			pop eax
 
-			je dontcollide;
+			je dontcollide
 
-			mov eax, dword ptr[esp + 0xa0];
-			push 0x05413B6;
-			retn;
+			mov eax, dword ptr[esp + 0xa0]
+			push 0x05413B6
+			retn
 
 		dontcollide:
-			mov eax, dword ptr[esp + 0xa0];
-			mov ecx, dword ptr[esp + 9ch];
-			push eax;
-			push ecx;
-			lea edx, [esp + 48h];
-			push edx;
-			mov eax, esi;
-			push 0x05413CB;
-			retn;
+			mov eax, dword ptr[esp + 0xa0]
+			mov ecx, dword ptr[esp + 9ch]
+			push eax
+			push ecx
+			lea edx, [esp + 48h]
+			push edx
+			mov eax, esi
+			push 0x05413CB
+			retn
 		}
 	}
 
@@ -41,19 +41,19 @@ namespace collision
 	{
 		__asm
 		{
-			push eax;
-			mov eax, g_playerEjection;
-			cmp byte ptr[eax + 12], 0;
-			pop eax;
+			push eax
+			mov eax, g_playerEjection
+			cmp byte ptr[eax + 12], 0
+			pop eax
 
-			je donteject;
+			je donteject
 
-			push 0x04F9EFA;
-			retn;
+			push 0x04F9EFA
+			retn
 
 		donteject:
-			push 0x04F9F03;
-			retn;
+			push 0x04F9F03
+			retn
 		}
 	}
 
@@ -63,25 +63,25 @@ namespace collision
 		__asm
 		{
 //			Check the value of sv_enableBounces
-			push eax;
-			mov eax, sv_enableBounces_plug;
-			cmp byte ptr[eax + 12], 1;
-			pop eax;
+			push eax
+			mov eax, sv_enableBounces_plug
+			cmp byte ptr[eax + 12], 1
+			pop eax
 
 //			Always bounce if sv_enableBounces is set to 1
-			je bounce;
+			je bounce
 
 //			Original code
-			cmp dword ptr[esp + 24h], 0;
-			jnz dontBounce;
+			cmp dword ptr[esp + 24h], 0
+			jnz dontBounce
 
 		bounce:
-			push 0x0424D58;
-			retn;
+			push 0x0424D58
+			retn
 
 		dontBounce:
-			push 0x0424D6C;
-			retn;
+			push 0x0424D6C
+			retn
 		}
 	}
 

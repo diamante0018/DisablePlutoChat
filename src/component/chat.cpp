@@ -3,20 +3,21 @@
 #include "loader/component_loader.hpp"
 #include "utils/hook.hpp"
 #include "utils/string.hpp"
+#include "utils/info_string.hpp"
 
 #include "chat.hpp"
 #include "dvars.hpp"
+#include "command.hpp"
 
 namespace chat
 {
-    utils::hook::detour client_command_hook;
     std::unordered_set<std::int32_t> mute_list{};
 
     void client_command_stub(int clientNum)
     {
-        char cmd[4096] = {0};
-        game::gentity_s* ent = game::g_entities + clientNum;
-        if (!ent->client)
+        char cmd[1024] = {0};
+        game::gentity_s* ent = &game::g_entities[clientNum];
+        if (ent->client == nullptr)
         {
 //          Not fully in game yet
             return;
@@ -27,17 +28,20 @@ namespace chat
         if (utils::string::starts_with(cmd, "die"))
         {
             game::Dvar_SetStringByName("sv_iw4madmin_command", utils::string::va("kill;%d", clientNum));
-            game::Cbuf_AddText(0, utils::string::va("tell %d You have commited suicide", clientNum));
+            game::Cbuf_AddText(0, utils::string::va("tell %d \"You have commited suicide\"", clientNum));
             return;
         }
 
-        if (utils::string::starts_with(cmd, "say") && (!dvars::sv_EnableGameChat->current.enabled || mute_list.contains(clientNum)))
+        if (utils::string::starts_with(cmd, "say"))
         {
-            game::Cbuf_AddText(0, utils::string::va("tell %d You are not allowed to type in the chat", clientNum));
-            return;
+            if (!dvars::sv_EnableGameChat->current.enabled || mute_list.contains(clientNum))
+            {
+                game::Cbuf_AddText(0, utils::string::va("tell %d \"You are not allowed to type in the chat\"", clientNum));
+                return;
+            }
         }
 
-        client_command_hook.invoke<void>(clientNum);
+        reinterpret_cast<void (*)(int)>(0x0502CB0)(clientNum);
     }
 
     class component final : public component_interface
@@ -45,13 +49,71 @@ namespace chat
     public:
         void post_unpack() override
         {
-            client_command_hook.create(0x0502CB0, &client_command_stub);
+            utils::hook::call(0x057192A, client_command_stub);
+            add_chat_commands();
         }
 
         void pre_destroy() override
         {
             mute_list.clear();
-            client_command_hook.clear();
+        }
+
+    private:
+        void add_chat_commands()
+        {
+            command::add("mute_player", [](const command::params& params)
+			{
+				if (params.size() < 2)
+				{
+					printf("USAGE: mute player <player number>\n");
+					return;
+				}
+
+				const std::string input = params.get(1);
+				const auto playerNum = std::stoi(input);
+                auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
+
+				if (playerNum >= max)
+				{
+					printf("Client number %d is out of bounds\n", playerNum);
+					return;
+				}
+
+				if (chat::mute_list.contains(playerNum))
+				{
+					printf("Client number %d is already muted\n", playerNum);
+					return;
+				}
+
+				chat::mute_list.insert(playerNum);
+			});
+
+			command::add("unmute_player", [](const command::params& params)
+			{
+				if (params.size() < 2)
+				{
+					printf("USAGE: unmute player <player number>\n");
+					return;
+				}
+
+				const std::string input = params.get(1);
+				const auto playerNum = std::stoi(input);
+                auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
+
+				if (playerNum >= max)
+				{
+					printf("Client number %d is out of bounds\n", playerNum);
+					return;
+				}
+
+				if (!chat::mute_list.contains(playerNum))
+				{
+					printf("Client number %d is not muted\n", playerNum);
+					return;
+				}
+
+				chat::mute_list.erase(playerNum);
+			});
         }
     };
 }

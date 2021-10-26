@@ -7,6 +7,20 @@ namespace game
 	typedef vec_t vec3_t[3];
 	typedef vec_t vec4_t[4];
 
+	struct StringTableCell
+	{
+		const char* string;
+		int hash;
+	};
+
+	struct StringTable
+	{
+		const char* name;
+		int columnCount;
+		int rowCount;
+		StringTableCell* values;
+	};
+
 	struct cmd_function_t
 	{
 		cmd_function_t* next;
@@ -374,10 +388,4 @@ namespace game
 
 	static_assert(sizeof(client_s) == 0x78698);
 #pragma pack(pop)
-
-	struct sv_clients
-	{
-		int maxClients;
-		client_s clients[18];
-	};
 }
