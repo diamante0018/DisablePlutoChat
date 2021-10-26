@@ -3,7 +3,6 @@
 #include "loader/component_loader.hpp"
 #include "utils/hook.hpp"
 #include "utils/string.hpp"
-#include "utils/info_string.hpp"
 
 #include "chat.hpp"
 #include "dvars.hpp"
@@ -62,15 +61,15 @@ namespace chat
         void add_chat_commands()
         {
             command::add("mute_player", [](const command::params& params)
-			{
-				if (params.size() < 2)
-				{
-					printf("USAGE: mute player <player number>\n");
-					return;
-				}
+            {
+                if (params.size() < 2)
+                {
+                    printf("USAGE: mute player <player number>\n");
+                    return;
+                }
 
-				const std::string input = params.get(1);
-				const auto playerNum = std::stoi(input);
+                const std::string input = params.get(1);
+                const auto playerNum = std::stoi(input);
                 auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
 				if (playerNum >= max)
@@ -85,8 +84,8 @@ namespace chat
 					return;
 				}
 
-				chat::mute_list.insert(playerNum);
-			});
+                chat::mute_list.insert(playerNum);
+            });
 
 			command::add("unmute_player", [](const command::params& params)
 			{
