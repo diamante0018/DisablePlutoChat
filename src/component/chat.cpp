@@ -72,47 +72,47 @@ namespace chat
                 const auto playerNum = std::stoi(input);
                 auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-				if (playerNum >= max)
-				{
-					printf("Client number %d is out of bounds\n", playerNum);
-					return;
-				}
+                if (playerNum >= max)
+                {
+                    printf("Client number %d is out of bounds\n", playerNum);
+                    return;
+                }
 
-				if (chat::mute_list.contains(playerNum))
-				{
-					printf("Client number %d is already muted\n", playerNum);
-					return;
-				}
+                if (chat::mute_list.contains(playerNum))
+                {
+                    printf("Client number %d is already muted\n", playerNum);
+                    return;
+                }
 
                 chat::mute_list.insert(playerNum);
-            });
+                });
 
-			command::add("unmute_player", [](const command::params& params)
-			{
-				if (params.size() < 2)
-				{
-					printf("USAGE: unmute player <player number>\n");
-					return;
-				}
+            command::add("unmute_player", [](const command::params& params)
+            {
+                if (params.size() < 2)
+                {
+                    printf("USAGE: unmute player <player number>\n");
+                    return;
+                }
 
-				const std::string input = params.get(1);
-				const auto playerNum = std::stoi(input);
+                const std::string input = params.get(1);
+                const auto playerNum = std::stoi(input);
                 auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-				if (playerNum >= max)
-				{
-					printf("Client number %d is out of bounds\n", playerNum);
-					return;
-				}
+                if (playerNum >= max)
+                {
+                    printf("Client number %d is out of bounds\n", playerNum);
+                    return;
+                }
 
-				if (!chat::mute_list.contains(playerNum))
-				{
-					printf("Client number %d is not muted\n", playerNum);
-					return;
-				}
+                if (!chat::mute_list.contains(playerNum))
+                {
+                    printf("Client number %d is not muted\n", playerNum);
+                    return;
+                }
 
-				chat::mute_list.erase(playerNum);
-			});
+                chat::mute_list.erase(playerNum);
+            });
         }
     };
 }
