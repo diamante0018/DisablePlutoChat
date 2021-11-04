@@ -2,7 +2,6 @@
 #include "loader/component_loader.hpp"
 #include "scheduler.hpp"
 
-#include "zombie.hpp"
 #include "utils/hook.hpp"
 
 namespace zombie

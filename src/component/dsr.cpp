@@ -4,7 +4,6 @@
 #include "utils/hook.hpp"
 #include "game/game.hpp"
 
-#include "dsr.hpp"
 #include "dvars.hpp"
 
 namespace dsr

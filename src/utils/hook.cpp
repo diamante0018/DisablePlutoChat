@@ -178,4 +178,16 @@ namespace utils::hook
 
 		delete[] bytes;
 	}
+
+	void redirect_jump(void* pointer, void* data)
+	{
+		char* operand_ptr = static_cast<char*>(pointer) + 2;
+		int new_operand = reinterpret_cast<int>(data) - (reinterpret_cast<int>(pointer) + 6);
+		set<int>(operand_ptr, new_operand);
+	}
+
+	void redirect_jump(size_t pointer, void* data)
+	{
+		redirect_jump(reinterpret_cast<void*>(pointer), data);
+	}
 }

@@ -3,8 +3,6 @@
 #include "loader/component_loader.hpp"
 #include "utils/hook.hpp"
 
-#include "melee.hpp"
-
 namespace melee
 {
 	utils::hook::detour fire_melee_hook;

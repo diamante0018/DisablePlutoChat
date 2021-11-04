@@ -77,6 +77,9 @@ namespace utils::hook
 
 	void jump(std::uintptr_t address, void* destination);
 
+	void redirect_jump(void* pointer, void* data);
+	void redirect_jump(size_t pointer, void* data);
+
 	template <typename T>
 	T extract(void* address)
 	{

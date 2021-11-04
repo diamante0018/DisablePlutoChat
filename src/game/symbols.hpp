@@ -11,6 +11,7 @@ namespace game
 	WEAK symbol<unsigned int(unsigned int id)> AllocThread{0x565580};
 	WEAK symbol<void(int type, VariableUnion u)> RemoveRefToValue{0x565730};
 	WEAK symbol<void(unsigned int id)> RemoveRefToObject{0x5681E0};
+	WEAK symbol<int(void*)> BG_GetMaxSprintTime{0x041BA70};
 
 	WEAK symbol<void(unsigned int weapon, bool isAlternate, char* output, unsigned int maxStringLen)> BG_GetWeaponNameComplete{0x42F760};
 

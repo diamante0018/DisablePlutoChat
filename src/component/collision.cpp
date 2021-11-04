@@ -3,8 +3,6 @@
 #include "loader/component_loader.hpp"
 #include "utils/hook.hpp"
 
-#include "collision.hpp"
-
 namespace collision
 {
 	game::dvar_t* g_playerCollision;
@@ -14,18 +12,18 @@ namespace collision
 		{
 			push eax
 			mov eax, g_playerCollision
-			cmp byte ptr[eax + 12], 0
+			cmp byte ptr [eax + 12], 0
 			pop eax
 
 			je dontcollide
 
-			mov eax, dword ptr[esp + 0xa0]
+			mov eax, dword ptr [esp + 0xa0]
 			push 0x05413B6
 			retn
 
 		dontcollide:
-			mov eax, dword ptr[esp + 0xa0]
-			mov ecx, dword ptr[esp + 9ch]
+			mov eax, dword ptr [esp + 0xa0]
+			mov ecx, dword ptr [esp + 9ch]
 			push eax
 			push ecx
 			lea edx, [esp + 48h]
@@ -43,7 +41,7 @@ namespace collision
 		{
 			push eax
 			mov eax, g_playerEjection
-			cmp byte ptr[eax + 12], 0
+			cmp byte ptr [eax + 12], 0
 			pop eax
 
 			je donteject
@@ -65,14 +63,14 @@ namespace collision
 //			Check the value of sv_enableBounces
 			push eax
 			mov eax, sv_enableBounces_plug
-			cmp byte ptr[eax + 12], 1
+			cmp byte ptr [eax + 12], 1
 			pop eax
 
 //			Always bounce if sv_enableBounces is set to 1
 			je bounce
 
 //			Original code
-			cmp dword ptr[esp + 24h], 0
+			cmp dword ptr [esp + 24h], 0
 			jnz dontBounce
 
 		bounce:

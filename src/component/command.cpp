@@ -5,7 +5,6 @@
 #include "utils/nt.hpp"
 
 #include "command.hpp"
-#include "chat.hpp"
 
 namespace command
 {

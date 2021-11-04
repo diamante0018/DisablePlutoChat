@@ -4,7 +4,6 @@
 #include "utils/hook.hpp"
 #include "utils/string.hpp"
 
-#include "chat.hpp"
 #include "dvars.hpp"
 #include "command.hpp"
 
