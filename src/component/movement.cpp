@@ -79,7 +79,7 @@ namespace movement
 			if (stance == game::PM_EFF_STANCE_DUCKED)
 			{
 				if ((playerState->pm_flags & 0x4000) == 0 ||
-					(*(unsigned int*)(playerState->__pad1 + 0x2D0) & 0x1000u) == 0) // TODO: Objectives
+					(*(unsigned int*)(playerState->__pad0 + 0x2D0) & 0x1000u) == 0) // TODO: Objectives
 				{
 					return player_duckedSpeedScale->current.value;
 				}

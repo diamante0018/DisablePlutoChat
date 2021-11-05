@@ -516,7 +516,7 @@ namespace game
 		int radarShowEnemyDirection;
 		int locationSelectionInfo;
 		SprintState_s sprintState;
-		char __pad1[12512];
+		char __pad0[12512];
 	};
 
 	struct pmove_t
