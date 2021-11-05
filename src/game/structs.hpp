@@ -401,16 +401,6 @@ namespace game
 	};
 
 #pragma pack(push, 1)
-	struct client_s
-	{
-		clientState_t state;
-		char __pad0[0x24];
-		netadr_s remote;
-		char __pad1[0x78658];
-	};
-
-	static_assert(sizeof(client_s) == 0x78698);
-
 	struct playerState_s
 	{
 		int commandTime;
@@ -455,19 +445,99 @@ namespace game
 		SprintState_s sprintState;
 		char __pad2[12512];
 	};
-
-	struct pmove_t
-	{
-		playerState_s* ps;
-		usercmd_s cmd;
-		usercmd_s oldcmd;
-	};
+#pragma pack(pop)
 
 	struct gclient_s
 	{
 		playerState_s ps;
 		char __pad0[716];
 		int flags;
+		int spectatorClient;
+		int lastCmdTime;
+//		int mpviewer; // Debug ?
+		int buttons;
+		int oldButtons;
+		int latched_buttons;
+		int buttonsSinceLastFrame;
+		float oldOrigin[3];
+		float fGunPitch;
+		float fGunYaw;
+		int damage_blood;
+		int damage_stun;
+		float damage_from[3];
+		int damage_fromWorld;
+		int accurateCount;
+		int accuracy_shots;
+		int accuracy_hits;
+		int inactivityTime;
+		int inactivityWarning;
+		int lastVoiceTime;
+		int switchTeamTime;
+		float currentAimSpreadScale;
+		float prevLinkedInvQuat[4];
+		bool prevLinkAnglesSet;
+		bool link_rotationMovesEyePos;
+		bool link_doCollision;
+		bool link_useTagAnglesForViewAngles;
+		bool link_useBaseAnglesForViewClamp;
+		float linkAnglesFrac;
+		char link_viewClamp[64];
+		char persistantPowerup[4];
+		int portalID;
+		int dropWeaponTime;
+		int sniperRifleFiredTime;
+		float sniperRifleMuzzleYaw;
+		int PCSpecialPickedUpCount;
+		int useHoldEntity;
+		int useHoldTime;
+		int useButtonDone;
+		int iLastCompassPlayerInfoEnt;
+		int compassPingTime;
+		int damageTime;
+		float v_dmg_roll;
+		float v_dmg_pitch;
+		float baseAngles[3];
+		float baseOrigin[3];
+		float swayViewAngles[3];
+		float swayOffset[3];
+		float swayAngles[3];
+		float recoilAngles[3];
+		float recoilSpeed[3];
+		float fLastIdleFactor;
+		int lastServerTime;
+		int lastWeapon;
+		bool lastWeaponAltStatus;
+		bool previouslyFiring;
+		bool previouslyFiringLeftHand;
+		bool previouslyUsingNightVision;
+		bool previouslySprinting;
+		int visionDuration[6];
+		char visionName[384];
+		int lastStand;
+		int lastStandTime;
+		int hudElemLastAssignedSoundID;
+		float lockedTargetOffset[3];
+		unsigned __int16 attachShieldTagName;
+		int hintForcedType;
+		int hintForcedString;
+	};
+
+#pragma pack(push, 1)
+	struct client_s
+	{
+		clientState_t state;
+		char __pad0[0x24];
+		netadr_s remote;
+		char __pad1[0x78658];
+	};
+
+	static_assert(sizeof(client_s) == 0x78698);
+
+	struct pmove_t
+	{
+		playerState_s* ps;
+		usercmd_s cmd;
+		usercmd_s oldcmd;
 	};
 
 	struct gentity_s
