@@ -21,19 +21,12 @@ namespace movement
 		}
 	}
 
-	game::dvar_t* dvar_register_float_stub(const char* name, float value, float min, float max, unsigned __int16 flags,
-		const char* description)
-	{
-		return game::Dvar_RegisterFloat(name, 2.0f, 0.0f, 5.0f, game::DVAR_FLAG_REPLICATED, description);
-	}
-
 	class component final : public component_interface
 	{
 	public:
 		void post_unpack() override
 		{
 			player_lastStandCrawlSpeedScale = game::Dvar_FindVar("player_lastStandCrawlSpeedScale");
-			player_lastStandCrawlSpeedScale->flags = game::DVAR_FLAG_REPLICATED;
 
 			utils::hook::set<BYTE>(0x041D55B, 0xEB); // PM_UpdateSprint
 			utils::hook::set<BYTE>(0x041D585, 0xEB); // PM_UpdateSprint
@@ -43,7 +36,6 @@ namespace movement
 
 //			utils::hook::set<float>(0x089C5F8, 10.0f); // Crawl speed
 			utils::hook::jump(0x04220E3, crawl_speed_stub);
-			utils::hook::call(0x0419109, dvar_register_float_stub);
 
 			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
 
