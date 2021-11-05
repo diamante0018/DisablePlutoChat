@@ -367,6 +367,24 @@ namespace game
 		char __pad2[0xEC];
 	};
 
+	struct usercmd_s
+	{
+		int serverTime;
+		int buttons;
+		int angles[3];
+		unsigned int weapon;
+		unsigned int offHand;
+		char forwardmove;
+		char rightmove;
+		unsigned __int16 airburstMarkDistance;
+		unsigned __int16 meleeChargeEnt;
+		unsigned char meleeChargeDist;
+		char selectedLoc[2];
+		char selectedLocAngle;
+		char remoteControlAngles[2];
+		int remoteControlMove;
+	};
+
 	enum clientState_t : std::int32_t
 	{
 		CS_FREE = 0,
@@ -387,5 +405,26 @@ namespace game
 	};
 
 	static_assert(sizeof(client_s) == 0x78698);
+
+	struct playerState_s
+	{
+		int commandTime;
+		int pm_type;
+		int pm_time;
+		int pm_flags;
+		char __pad1[508];
+		int sprintButtonUpRequired; // 0x20C
+		int sprintDelay; // 0x210
+		char __pad2[4];
+		int lastSprintEnd; // 0x218
+	};
+
+	struct pmove_t
+	{
+		playerState_s* ps;
+		usercmd_s cmd;
+		usercmd_s oldcmd;
+	};
+
 #pragma pack(pop)
 }
