@@ -379,17 +379,6 @@ namespace game
 		CS_ACTIVE = 5
 	};
 
-#pragma pack(push, 1)
-	struct client_s
-	{
-		clientState_t state;
-		char __pad0[0x24];
-		netadr_s remote;
-		char __pad1[0x78658];
-	};
-
-	static_assert(sizeof(client_s) == 0x78698);
-
 	struct SprintState_s
 	{
 		int sprintButtonUpRequired; // 0x20C
@@ -401,8 +390,26 @@ namespace game
 
 	struct PlayerVehicleState
 	{
-		char __pad0[72];
+		int entity;
+		int flags;
+		float origin[3];
+		float angles[3];
+		float velocity[3];
+		float angVelocity[3];
+		float tilt[2];
+		float tiltVelocity[2];
 	};
+
+#pragma pack(push, 1)
+	struct client_s
+	{
+		clientState_t state;
+		char __pad0[0x24];
+		netadr_s remote;
+		char __pad1[0x78658];
+	};
+
+	static_assert(sizeof(client_s) == 0x78698);
 
 	struct playerState_s
 	{
