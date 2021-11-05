@@ -12,6 +12,7 @@ namespace game
 	WEAK symbol<void(int type, VariableUnion u)> RemoveRefToValue{0x565730};
 	WEAK symbol<void(unsigned int id)> RemoveRefToObject{0x5681E0};
 	WEAK symbol<int(void*)> BG_GetMaxSprintTime{0x041BA70};
+	WEAK symbol<void(gentity_s* ent, float* position, float* orientation)> TeleportPlayer{0x050D840};
 
 	WEAK symbol<void(unsigned int weapon, bool isAlternate, char* output, unsigned int maxStringLen)> BG_GetWeaponNameComplete{0x42F760};
 
@@ -76,7 +77,6 @@ namespace game
 	WEAK symbol<void()> Com_Quit_f{0x05556B0};
 	WEAK symbol<void(int index, char* buffer, int bufferSize)> SV_GetUserinfo{0x0573E00};
 	WEAK symbol<bool(const char* s)> Info_Validate{0x05C3140};
-	WEAK symbol<void(game::gentity_s*, float* pos, float* orientation)> TeleportPlayer{0x050D840};
 	WEAK symbol<void(const char*, const StringTable**)> StringTable_GetAsset{0x05B87D0};
 	WEAK symbol<int(const StringTable*, int, const char*)> StringTable_LookupRowNumForValue{0x05B8610};
 	WEAK symbol<const char*(const StringTable*, int, int)> StringTable_GetColumnValueForRow{0x05B86A0};

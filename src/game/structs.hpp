@@ -351,22 +351,6 @@ namespace game
 		dvar_t* hashNext;
 	};
 
-	struct gclient_s
-	{
-		char __pad0[0x35CC];
-		int flags;
-	};
-
-	struct gentity_s
-	{
-		int entnum;
-		char __pad0[0x154];
-		gclient_s* client;
-		char __pad1[0x28];
-		int flags;
-		char __pad2[0xEC];
-	};
-
 	struct usercmd_s
 	{
 		int serverTime;
@@ -406,17 +390,63 @@ namespace game
 
 	static_assert(sizeof(client_s) == 0x78698);
 
+	struct SprintState_s
+	{
+		int sprintButtonUpRequired; // 0x20C
+		int sprintDelay; // 0x210
+		int lastSprintStart;
+		int lastSprintEnd; // 0x218
+		int sprintStartMaxLength;
+	};
+
+	struct PlayerVehicleState
+	{
+		char __pad0[72];
+	};
+
 	struct playerState_s
 	{
 		int commandTime;
 		int pm_type;
 		int pm_time;
 		int pm_flags;
-		char __pad1[508];
-		int sprintButtonUpRequired; // 0x20C
-		int sprintDelay; // 0x210
-		char __pad2[4];
-		int lastSprintEnd; // 0x218
+		int otherFlags;
+		int linkFlags;
+		int bobCycle;
+		float origin[3];
+		float velocity[3];
+		int grenadeTimeLeft;
+		int throwbackGrenadeOwner;
+		int throwbackGrenadeTimeLeft;
+		unsigned int throwbackWeapon;
+		int remoteEyesEnt;
+		int remoteEyesTagname;
+		int remoteControlEnt;
+		int remoteTurretEnt;
+		int foliageSoundTime;
+		int gravity;
+		int speed;
+		float delta_angles[3];
+		int groundEntityNum;
+		float vLadderVec[3];
+		int jumpTime;
+		float jumpOriginZ;
+		int legsTimer;
+		int legsAnim;
+		int torsoTimer;
+		int torsoAnim;
+		int legsAnimDuration;
+		int torsoAnimDuration;
+		int damageTimer;
+		int damageDuration;
+		int flinchYawAnim;
+		int corpseIndex;
+		PlayerVehicleState vehicleState;
+		int movementDir;
+		int eFlags;
+		char __pad1[272];
+		SprintState_s sprintState;
+		char __pad2[12512];
 	};
 
 	struct pmove_t
@@ -424,6 +454,23 @@ namespace game
 		playerState_s* ps;
 		usercmd_s cmd;
 		usercmd_s oldcmd;
+	};
+
+	struct gclient_s
+	{
+		playerState_s ps;
+		char __pad0[716];
+		int flags;
+	};
+
+	struct gentity_s
+	{
+		int entnum;
+		char __pad0[0x154];
+		gclient_s* client;
+		char __pad1[0x28];
+		int flags;
+		char __pad2[0xEC];
 	};
 
 #pragma pack(pop)
