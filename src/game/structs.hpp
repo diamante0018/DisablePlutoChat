@@ -369,6 +369,15 @@ namespace game
 		int remoteControlMove;
 	};
 
+	enum EffectiveStance
+	{
+		PM_EFF_STANCE_DEFAULT = 0,
+		PM_EFF_STANCE_PRONE = 1,
+		PM_EFF_STANCE_DUCKED = 2,
+		PM_EFF_STANCE_LASTSTANDCRAWL = 3,
+		PM_EFF_STANCE_COUNT = 4
+	};
+
 	enum clientState_t : std::int32_t
 	{
 		CS_FREE = 0,
@@ -398,6 +407,30 @@ namespace game
 		float angVelocity[3];
 		float tilt[2];
 		float tiltVelocity[2];
+	};
+
+	struct EntityEvent
+	{
+		int eventType;
+		int eventParm;
+	};
+
+	struct playerEvents_t
+	{
+		int eventSequence;
+		EntityEvent events[4];
+		int oldEventSequence;
+		int timeADSCameUp;
+	};
+
+	static_assert(sizeof(playerEvents_t) == 44);
+
+	enum ViewLockTypes
+	{
+		PLAYERVIEWLOCK_NONE = 0,
+		PLAYERVIEWLOCK_FULL = 1,
+		PLAYERVIEWLOCK_WEAPONJITTER = 2,
+		PLAYERVIEWLOCKCOUNT = 3
 	};
 
 #pragma pack(push, 1)
@@ -441,11 +474,77 @@ namespace game
 		PlayerVehicleState vehicleState;
 		int movementDir;
 		int eFlags;
-		char __pad1[272];
+		playerEvents_t pe;
+		int unpredictableEventSequence;
+		int unpredictableEventSequenceOld;
+		int unpredictableEvents[4];
+		char unpredictableEventParms[16];
+		int clientNum;
+		int viewmodelIndex;
+		float viewangles[3];
+		int viewHeightTarget;
+		float viewHeightCurrent;
+		int viewHeightLerpTime;
+		int viewHeightLerpTarget;
+		int viewHeightLerpDown;
+		char viewAngleClampBase[8];
+		char viewAngleClampRange[8];
+		int damageEvent;
+		int damageYaw;
+		int damagePitch;
+		int damageCount;
+		int damageFlags;
+		int stats[4];
+		float proneDirection;
+		float proneDirectionPitch;
+		float proneTorsoPitch;
+		ViewLockTypes viewlocked;
+		int viewlocked_entNum;
+		float linkAngles[3];
+		float linkWeaponAngles[3];
+		int linkWeaponEnt;
+		int loopSound;
+		int cursorHint;
+		int cursorHintString;
+		int cursorHintEntIndex;
+		int cursorHintDualWield;
+		int iCompassPlayerInfo;
+		int radarEnabled;
+		int radarBlocked;
+		int radarMode;
+		int radarStrength;
+		int radarShowEnemyDirection;
+		int locationSelectionInfo;
 		SprintState_s sprintState;
-		char __pad2[12512];
+		char __pad1[12512];
+	};
+
+	struct pmove_t
+	{
+		playerState_s* ps;
+		usercmd_s cmd;
+		usercmd_s oldcmd;
+		int tracemask;
+		int numtouch;
+		int touchents[32];
+		char bounds[24];
+		float speed;
+		int proneChange;
+		float maxSprintTimeMultiplier;
+		bool mantleStarted;
+		float mantleEndPos[3];
+		int mantleDuration;
+		int viewChangeTime;
+		float viewChange;
+		float fTorsoPitch;
+		float fWaistPitch;
+		int remoteTurretFireTime;
+		int lastUpdateCMDServerTime;
+		unsigned char handler;
 	};
 #pragma pack(pop)
+
+	static_assert(sizeof(playerState_s) == 13056);
 
 	struct gclient_s
 	{
@@ -532,13 +631,6 @@ namespace game
 	};
 
 	static_assert(sizeof(client_s) == 0x78698);
-
-	struct pmove_t
-	{
-		playerState_s* ps;
-		usercmd_s cmd;
-		usercmd_s oldcmd;
-	};
 
 	struct gentity_s
 	{
