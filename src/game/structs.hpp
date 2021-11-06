@@ -388,6 +388,14 @@ namespace game
 		CS_ACTIVE = 5
 	};
 
+	struct MantleState
+	{
+		float yaw;
+		int timer;
+		int transIndex;
+		int flags;
+	};
+
 	struct SprintState_s
 	{
 		int sprintButtonUpRequired; // 0x20C
@@ -408,6 +416,28 @@ namespace game
 		float tilt[2];
 		float tiltVelocity[2];
 	};
+
+	struct PlayerActiveWeaponState
+	{
+		int weapAnim;
+		int weaponTime;
+		int weaponDelay;
+		int weaponRestrictKickTime;
+		int weaponState;
+		int weaponHandFlags;
+		int weaponShotCount;
+	};
+
+	struct PlayerEquippedWeaponState
+	{
+		bool usedBefore;
+		bool dualWielding;
+		bool inAltMode;
+		bool needsRechamber[2];
+		int zoomLevelIndex;
+	};
+
+	static_assert(sizeof(PlayerEquippedWeaponState) == 12);
 
 	struct EntityEvent
 	{
@@ -431,6 +461,15 @@ namespace game
 		PLAYERVIEWLOCK_FULL = 1,
 		PLAYERVIEWLOCK_WEAPONJITTER = 2,
 		PLAYERVIEWLOCKCOUNT = 3
+	};
+
+	enum TraceHitType
+	{
+		TRACE_HITTYPE_NONE = 0,
+		TRACE_HITTYPE_ENTITY = 1,
+		TRACE_HITTYPE_DYNENT_MODEL = 2,
+		TRACE_HITTYPE_DYNENT_BRUSH = 3,
+		TRACE_HITTYPE_GLASS = 4
 	};
 
 #pragma pack(push, 1)
@@ -516,7 +555,21 @@ namespace game
 		int radarShowEnemyDirection;
 		int locationSelectionInfo;
 		SprintState_s sprintState;
-		char __pad0[12512];
+		float holdBreathScale;
+		int holdBreathTimer;
+		float moveSpeedScaleMultiplier;
+		MantleState mantleState;
+		PlayerActiveWeaponState weapState[2];
+		unsigned int weaponsEquipped[15];
+		PlayerEquippedWeaponState weapEquippedData[15];
+		char weapCommon[376];
+		int meleeChargeDist;
+		int meleeChargeTime;
+		int meleeChargeEnt;
+		int airburstMarkDistance;
+		unsigned int perks[2];
+		unsigned int perkSlots[9];
+		char __pad0[11752];
 	};
 
 	struct pmove_t
@@ -620,6 +673,45 @@ namespace game
 		int hintForcedType;
 		int hintForcedString;
 	};
+
+	struct trace_t
+	{
+		float fraction;
+		float normal[3];
+		int surfaceFlags;
+		int contents;
+		char material[4];
+		TraceHitType hitType;
+		unsigned __int16 hitId;
+		float fractionForHitType;
+		unsigned __int16 modelIndex;
+		unsigned __int16 partName;
+		unsigned __int16 partGroup;
+		bool allsolid;
+		bool startsolid;
+		bool walkable;
+	};
+
+	static_assert(sizeof(trace_t) == 52);
+
+	struct pml_t
+	{
+		float forward[3];
+		float right[3];
+		float up[3];
+		float frametime;
+		int msec;
+		int walking;
+		int groundPlane;
+		int almostGroundPlane;
+		trace_t groundTrace;
+		float impactSpeed;
+		float previous_origin[3];
+		float previous_velocity[3];
+		int holdrand;
+	};
+
+	static_assert(sizeof(pml_t) == 140);
 
 #pragma pack(push, 1)
 	struct client_s

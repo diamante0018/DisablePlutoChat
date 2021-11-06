@@ -104,7 +104,7 @@ namespace movement
 		if (stance == game::PM_EFF_STANCE_DUCKED)
 		{
 			if ((playerState->pm_flags & 0x4000) == 0 ||
-				(*(unsigned int*)(playerState->__pad0 + 0x2D0) & 0x1000u) == 0)
+				(playerState->perks[0] & 0x1000u) == 0)
 			{
 				return player_duckedSpeedScale->current.value;
 			}
@@ -174,20 +174,14 @@ namespace movement
 				g_client->lastStandTime = 0;
 			});
 
-			command::add("set_unlimited_sprint", [](const command::params&)
+			command::add("marathon_perk", [](const command::params& params)
 			{
-				printf("Warning! This is permanent\n");
-				unlimited_sprint();
-			});
-		}
+				if (params.size() < 2) return;
 
-		static void unlimited_sprint()
-		{
-			utils::hook::set<BYTE>(0x041D55B, 0xEB); // PM_UpdateSprint
-			utils::hook::set<BYTE>(0x041D585, 0xEB); // PM_UpdateSprint
-			utils::hook::set<BYTE>(0x041D27A, 0xEB); // PM_GetSprintLeft
-			utils::hook::set<BYTE>(0x041D290, 0xEB); // PM_GetSprintLeft
-			utils::hook::set<BYTE>(0x041D308, 0xEB); // PM_GetSprintLeftLastTime
+				auto g_client = game::g_entities[std::stoi(params.get(1))].client;
+				auto playerState = &g_client->ps;
+				playerState->perks[0] ^= 0x4000u;
+			});
 		}
 
 		static void register_dvars()
