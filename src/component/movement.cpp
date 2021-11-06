@@ -35,8 +35,8 @@ namespace movement
 	float pm_cmd_scale_for_stance(game::pmove_t* move)
 	{
 		float scale{};
-
 		auto* playerState = move->ps;
+
 		if (playerState->viewHeightLerpTime != 0 && playerState->viewHeightLerpTarget == 0xB)
 		{
 			scale = move->cmd.serverTime - playerState->viewHeightLerpTime / 400.0f;
