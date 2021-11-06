@@ -85,7 +85,7 @@ namespace movement
 		}
 		else if (stance == game::PM_EFF_STANCE_LASTSTANDCRAWL)
 		{
-				return player_lastStandCrawlSpeedScale->current.value;
+			return player_lastStandCrawlSpeedScale->current.value;
 		}
 
 		return scale;
