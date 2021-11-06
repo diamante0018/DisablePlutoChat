@@ -42,14 +42,26 @@ namespace movement
 			scale = move->cmd.serverTime - playerState->viewHeightLerpTime / 400.0f;
 			if (0.0f <= scale)
 			{
-				auto result = (scale < 1.0f) << 8 | (scale == 1.0f) << 0xE;
-				if (result == 0)
+				auto flags = 0;
+				if (scale < 1.0f)
+				{
+					flags |= 1 << 8;
+				}
+				if (scale == 1.0f)
+				{
+					flags |= 1 << 14;
+				}
+
+				if (flags == 0)
 				{
 					scale = 1.0f;
 					return scale * 0.15f + (1.0f - scale) * 0.65f;
 				}
 
-				if (scale != 0.0f) return scale * 0.15f + (1.0f - scale) * 0.65f;
+				if (scale != 0.0f)
+				{
+					return scale * 0.15f + (1.0f - scale) * 0.65f;
+				}
 			}
 		}
 
@@ -59,8 +71,18 @@ namespace movement
 			scale = 400.0f / move->cmd.serverTime - playerState->viewHeightLerpTime;
 			if (0.0f <= scale)
 			{
-				auto result = (scale < 1.0f) << 8 | (scale == 1.0f) << 0xE;
-				if (result == 0)
+				auto flags = 0;
+				if (scale < 1.0f)
+				{
+					flags |= 1 << 8;
+				}
+
+				if (scale == 1.0f)
+				{
+					flags |= 1 << 14;
+				}
+
+				if (flags == 0)
 				{
 					scale = 1.0f;
 				}
