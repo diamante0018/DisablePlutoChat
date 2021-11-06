@@ -11,6 +11,27 @@ namespace movement
 	game::dvar_t* player_duckedSpeedScale;
 	game::dvar_t* player_proneSpeedScale;
 
+	int pm_get_effective_stance(game::playerState_s* ps) // Inlined on IW5
+	{
+		auto heightTarget = ps->viewHeightTarget;
+		if (heightTarget == 0x16)
+		{
+			return game::PM_EFF_STANCE_LASTSTANDCRAWL;
+		}
+
+		if (heightTarget == 0x28)
+		{
+			return game::PM_EFF_STANCE_DUCKED;
+		}
+
+		if (heightTarget == 0xB)
+		{
+			return game::PM_EFF_STANCE_PRONE;
+		}
+
+		return game::PM_EFF_STANCE_DEFAULT;
+	}
+
 	float pm_cmd_scale_for_stance(game::pmove_t* move)
 	{
 		float scale{};
@@ -51,24 +72,7 @@ namespace movement
 		}
 
 		scale = 1.0f;
-		auto heightTarget = playerState->viewHeightTarget;
-		int stance{};
-
-		if (heightTarget == 0x16)
-		{
-			stance = game::PM_EFF_STANCE_LASTSTANDCRAWL;
-		}
-		else
-		{
-			if (heightTarget == 0x28)
-			{
-				stance = game::PM_EFF_STANCE_DUCKED;
-			}
-			else
-			{
-				stance = (heightTarget == 0xB);
-			}
-		}
+		auto stance = pm_get_effective_stance(playerState);
 
 		if (stance == game::PM_EFF_STANCE_PRONE)
 		{
