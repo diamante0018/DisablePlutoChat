@@ -72,22 +72,20 @@ namespace movement
 
 		if (stance == game::PM_EFF_STANCE_PRONE)
 		{
-			scale = player_proneSpeedScale->current.value;
+			return player_proneSpeedScale->current.value;
 		}
-		else
+
+		if (stance == game::PM_EFF_STANCE_DUCKED)
 		{
-			if (stance == game::PM_EFF_STANCE_DUCKED)
+			if ((playerState->pm_flags & 0x4000) == 0 ||
+				(*(unsigned int*)(playerState->__pad0 + 0x2D0) & 0x1000u) == 0)
 			{
-				if ((playerState->pm_flags & 0x4000) == 0 ||
-					(*(unsigned int*)(playerState->__pad0 + 0x2D0) & 0x1000u) == 0)
-				{
-					return player_duckedSpeedScale->current.value;
-				}
+				return player_duckedSpeedScale->current.value;
 			}
-			else if (stance == game::PM_EFF_STANCE_LASTSTANDCRAWL)
-			{
+		}
+		else if (stance == game::PM_EFF_STANCE_LASTSTANDCRAWL)
+		{
 				return player_lastStandCrawlSpeedScale->current.value;
-			}
 		}
 
 		return scale;
