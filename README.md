@@ -4,7 +4,7 @@ Some made it in the Plutonium Client!
 
 # Credits
 * [ineedbots](https://github.com/ineedbots) He knows what's up with the IW engine
-* [RektInator](https://github.com/RektInator) General Advice
+* [RektInator](https://github.com/RektInator) General advice. Very helpful :)
 
 ## Disclaimer
 
