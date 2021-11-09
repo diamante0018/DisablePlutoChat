@@ -109,7 +109,7 @@ namespace movement
 				return player_duckedSpeedScale->current.value;
 			}
 		}
-		else if (stance == game::PM_EFF_STANCE_LASTSTANDCRAWL)
+		if (stance == game::PM_EFF_STANCE_LASTSTANDCRAWL)
 		{
 			return player_lastStandCrawlSpeedScale->current.value;
 		}
