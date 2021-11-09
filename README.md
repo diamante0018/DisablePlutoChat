@@ -1,5 +1,10 @@
 # DisablePlutoChat
-Disables game chat for good
+Disables game chat for good. This project expanded over the last few months and many more features were added.
+Some made it in the Plutonium Client!
+
+# Credits
+* [ineedbots](https://github.com/ineedbots) He knows what's up with the IW engine
+* [RektInator](https://github.com/RektInator) General advice. Very helpful :)
 
 ## Disclaimer
 
