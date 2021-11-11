@@ -4,12 +4,12 @@
 #include "utils/hook.hpp"
 #include "utils/string.hpp"
 
-#include "dvars.hpp"
 #include "command.hpp"
 
 namespace chat
 {
     std::unordered_set<std::int32_t> mute_list{};
+    game::dvar_t* sv_EnableGameChat;
 
     void client_command_stub(int clientNum)
     {
@@ -26,15 +26,15 @@ namespace chat
         if (utils::string::starts_with(cmd, "die"))
         {
             game::Dvar_SetStringByName("sv_iw4madmin_command", utils::string::va("kill;%d", clientNum));
-            game::Cbuf_AddText(0, utils::string::va("tell %d \"You have commited suicide\"", clientNum));
+            game::Cbuf_InsertText(0, utils::string::va("tell %d \"You have commited suicide\"", clientNum));
             return;
         }
 
         if (utils::string::starts_with(cmd, "say"))
         {
-            if (!dvars::sv_EnableGameChat->current.enabled || mute_list.contains(clientNum))
+            if (!sv_EnableGameChat->current.enabled || mute_list.contains(clientNum))
             {
-                game::Cbuf_AddText(0, utils::string::va("tell %d \"You are not allowed to type in the chat\"", clientNum));
+                game::Cbuf_InsertText(0, utils::string::va("tell %d \"You are not allowed to type in the chat\"", clientNum));
                 return;
             }
         }
@@ -49,6 +49,8 @@ namespace chat
         {
             utils::hook::call(0x057192A, client_command_stub);
             add_chat_commands();
+
+            sv_EnableGameChat = game::Dvar_RegisterBool("sv_EnableGameChat", true, game::DVAR_FLAG_NONE, "Enables global and team chat");
         }
 
         void pre_destroy() override
@@ -57,7 +59,7 @@ namespace chat
         }
 
     private:
-        void add_chat_commands()
+        static void add_chat_commands()
         {
             command::add("mute_player", [](const command::params& params)
             {
@@ -67,9 +69,9 @@ namespace chat
                     return;
                 }
 
-                const std::string input = params.get(1);
-                const auto playerNum = std::stoi(input);
-                auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
+                const auto input = params.get(1);
+                const auto playerNum = std::atoi(input);
+                const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
                 if (playerNum >= max)
                 {
@@ -84,7 +86,7 @@ namespace chat
                 }
 
                 chat::mute_list.insert(playerNum);
-                });
+            });
 
             command::add("unmute_player", [](const command::params& params)
             {
@@ -94,9 +96,9 @@ namespace chat
                     return;
                 }
 
-                const std::string input = params.get(1);
-                const auto playerNum = std::stoi(input);
-                auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
+                const auto input = params.get(1);
+                const auto playerNum = std::atoi(input);
+                const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
                 if (playerNum >= max)
                 {

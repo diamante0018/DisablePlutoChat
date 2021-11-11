@@ -21,11 +21,12 @@ namespace zombie
 //                  Might assign the zombie header type to the player for some time before finally removing them
                     game::SV_DropClientInternal(client, "EXE_TRANSMITERROR", 1);
                     warn_list.erase(i);
-                    return;
                 }
-
-//              If the player is still connecting after 60 seconds, they will be kicked
-                warn_list.insert(i);
+                else
+                {
+//                  If the player is still connecting after 60 seconds, they will be kicked
+                    warn_list.insert(i);
+                }
             }
             else
             {

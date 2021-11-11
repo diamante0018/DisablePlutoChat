@@ -11,9 +11,9 @@ namespace movement
 	game::dvar_t* player_duckedSpeedScale;
 	game::dvar_t* player_proneSpeedScale;
 
-	int pm_get_effective_stance(game::playerState_s* ps) // Inlined on IW5
+	int pm_get_effective_stance(const game::playerState_s* ps) // Inlined on IW5
 	{
-		auto heightTarget = ps->viewHeightTarget;
+		const auto heightTarget = ps->viewHeightTarget;
 		if (heightTarget == 0x16)
 		{
 			return game::PM_EFF_STANCE_LASTSTANDCRAWL;
@@ -35,7 +35,7 @@ namespace movement
 	float pm_cmd_scale_for_stance(game::pmove_t* move)
 	{
 		float scale{};
-		auto* playerState = move->ps;
+		const auto* playerState = move->ps;
 
 		if (playerState->viewHeightLerpTime != 0 && playerState->viewHeightLerpTarget == 0xB)
 		{
@@ -155,7 +155,7 @@ namespace movement
 			{
 				if (params.size() < 5) return;
 
-				auto ent = &game::g_entities[std::stoi(params.get(1))];
+				const auto ent = &game::g_entities[std::atoi(params.get(1))];
 				game::vec3_t newOrigin{};
 				game::vec3_t neutralViewAngle{ 0.0f, 0.0f, 0.0f };
 				newOrigin[0] = std::stof(params.get(2));
@@ -169,7 +169,10 @@ namespace movement
 			{
 				if (params.size() < 2) return;
 
-				auto g_client = game::g_entities[std::stoi(params.get(1))].client;
+				auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
+
+				if (g_client == nullptr) return;
+
 				g_client->lastStand = 1;
 				g_client->lastStandTime = 0;
 			});
@@ -178,7 +181,10 @@ namespace movement
 			{
 				if (params.size() < 2) return;
 
-				auto g_client = game::g_entities[std::stoi(params.get(1))].client;
+				const auto g_client = game::g_entities[std::atoi(params.get(1))].client;
+
+				if (g_client == nullptr) return;
+
 				auto playerState = &g_client->ps;
 				playerState->perks[0] ^= 0x4000u;
 			});

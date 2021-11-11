@@ -40,7 +40,19 @@ namespace game
 		const char** argv[8];
 	};
 
-	enum netadrtype_t : std::uint32_t
+	typedef enum
+	{
+		NS_CLIENT1 = 0,
+		NS_CLIENT2 = 1,
+		NS_CLIENT3 = 2,
+		NS_CLIENT4 = 3,
+		NS_MAXCLIENTS = 4,
+		NS_SERVER = 4,
+		NS_PACKET = 5,
+		NS_INVALID_NETSRC = 6
+	} netsrc_t;
+
+	enum netadrtype_t
 	{
 		NA_BOT = 0x0,
 		NA_BAD = 0x1,
@@ -53,12 +65,13 @@ namespace game
 	{
 		netadrtype_t type;
 		unsigned char ip[4];
-		uint16_t port;
-		uint16_t field_A;
-		uint32_t field_C;
-		uint32_t field_10;
-		uint32_t index;
+		unsigned __int16 port;
+		netadrtype_t localNetID;
+		char __pad0[4];
+		unsigned int index;
 	};
+
+	static_assert(sizeof(netadr_s) == 24);
 
 	struct msg_t
 	{
@@ -735,4 +748,6 @@ namespace game
 	};
 
 #pragma pack(pop)
+
+	static_assert(sizeof(gentity_s) == 0x274);
 }

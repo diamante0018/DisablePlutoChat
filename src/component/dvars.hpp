@@ -2,8 +2,6 @@
 
 namespace dvars
 {
-	extern game::dvar_t* sv_EnableGameChat;
-
 	namespace override
 	{
 		void Dvar_RegisterBool(const std::string& name, bool value, const unsigned short flags, const std::string& description = "");

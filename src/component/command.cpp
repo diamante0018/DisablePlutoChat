@@ -127,9 +127,9 @@ namespace command
 					return;
 				}
 
-				const std::string input = params.get(1);
-				const auto playerNum = std::stoi(input);
-				auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
+				const auto input = params.get(1);
+				const auto playerNum = std::atoi(input);
+				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
 				if (playerNum >= max)
 				{
@@ -143,7 +143,7 @@ namespace command
 					return;
 				}
 
-				game::NET_OutOfBandPrint_t(4, game::svs_clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
+				game::NET_OutOfBandPrint(game::NS_SERVER, game::svs_clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
 			});
 
 			add("say_as_player", [](const params& params)
@@ -154,9 +154,9 @@ namespace command
 					return;
 				}
 
-				const std::string input = params.get(1);
-				const auto playerNum = std::stoi(input);
-				auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
+				const auto input = params.get(1);
+				const auto playerNum = std::atoi(input);
+				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
 				if (playerNum >= max)
 				{
@@ -170,10 +170,11 @@ namespace command
 					return;
 				}
 
-				std::string message{};
-				message = params.join(2);
+				const auto message = params.join(2);
+				const auto player = &game::g_entities[playerNum];
 
-				auto* player = &game::g_entities[playerNum];
+				if (player->client == nullptr) return;
+
 				game::Cmd_Say_f(player, 0, 0, message.data());
 			});
 
@@ -185,9 +186,9 @@ namespace command
 					return;
 				}
 
-				const std::string input = params.get(1);
-				const auto playerNum = std::stoi(input);
-				auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
+				const auto input = params.get(1);
+				const auto playerNum = std::atoi(input);
+				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
 				if (playerNum >= max)
 				{

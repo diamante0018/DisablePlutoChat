@@ -18,8 +18,9 @@ namespace game
 
 	WEAK symbol<const char*(int index)> ConcatArgs{0x502150};
 	WEAK symbol<void(int localClientNum, const char* text)> Cbuf_AddText{0x545680};
+	WEAK symbol<void(int localClientNum, const char* text)> Cbuf_InsertText{0x0545770};
 	WEAK symbol<void(int localClientNum, int a2, const char* message, int a4, int a5, int a6)> Client_Print{0x0487B00};
-	WEAK symbol<void(const char* cmdName, void(), cmd_function_t* allocedCmd)> Cmd_AddCommandInternal{0x545DF0};
+	WEAK symbol<void(const char* cmdName, void(), cmd_function_t* cmd)> Cmd_AddCommandInternal{0x545DF0};
 	WEAK symbol<void(const char* cmdName)> Cmd_RemoveCommand{0x545E20};
 	WEAK symbol<const char*(int index)> Cmd_Argv{0x467600};
 	WEAK symbol<void()> SV_DisconnectAllClients{0x05749E0};
@@ -72,7 +73,7 @@ namespace game
 	WEAK symbol<void*(jmp_buf* Buf, int Value)> longjmp{0x7363BC};
 	WEAK symbol<int(jmp_buf* Buf)> _setjmp{0x734CF8};
 
-	WEAK symbol<unsigned int(int sock, game::netadr_s dest, const char* message)> NET_OutOfBandPrint_t{0x055C830};
+	WEAK symbol<bool(netsrc_t, game::netadr_s dest, const char* message)> NET_OutOfBandPrint{0x055C830};
 	WEAK symbol<void(game::gentity_s* ent, int a2, int which_chat, const char* message)> Cmd_Say_f{0x0502B60};
 	WEAK symbol<void()> Com_Quit_f{0x05556B0};
 	WEAK symbol<void(int index, char* buffer, int bufferSize)> SV_GetUserinfo{0x0573E00};

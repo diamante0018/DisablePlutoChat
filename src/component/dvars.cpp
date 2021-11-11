@@ -8,8 +8,6 @@
 
 namespace dvars
 {
-	game::dvar_t* sv_EnableGameChat;
-
 	struct dvar_base
 	{
 		unsigned short flags{};
@@ -186,8 +184,6 @@ namespace dvars
 			dvar_register_float_hook.create(0x05BEA80, &dvar_register_float);
 			dvar_register_int_hook.create(0x05BEA40, &dvar_register_int);
 			dvar_register_string_hook.create(0x05BEC90, &dvar_register_string);
-
-			sv_EnableGameChat = game::Dvar_RegisterBool("sv_EnableGameChat", true, game::DVAR_FLAG_NONE, "Enables global and team chat");
 		}
 
 		void pre_destroy() override
