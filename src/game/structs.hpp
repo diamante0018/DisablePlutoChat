@@ -66,7 +66,7 @@ namespace game
 		netadrtype_t type;
 		unsigned char ip[4];
 		unsigned __int16 port;
-		netadrtype_t localNetID;
+		netsrc_t localNetID;
 		char __pad0[4];
 		unsigned int index;
 	};
