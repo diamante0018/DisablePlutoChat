@@ -201,7 +201,9 @@ namespace movement
 			utils::hook::call(0x041F995, pm_trace_stub);
 
 			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
+
 			utils::hook::set<BYTE>(0x04228C1, 0xEB); // PM_JitterPoint
+			utils::hook::nop(0x042286D, 2); // PM_JitterPoint
 
 			utils::hook::jump(0x0422A0B, pm_jitter_point_stub);
 
