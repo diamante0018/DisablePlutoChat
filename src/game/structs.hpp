@@ -681,6 +681,8 @@ namespace game
 		float halfSize[3];
 	};
 
+	static_assert(sizeof(Bounds) == 24);
+
 	struct pmove_t
 	{
 		playerState_s* ps;

@@ -153,6 +153,32 @@ namespace movement
 		return;
 	}
 
+	void jump_clear_state_wrap(game::pmove_t* move)
+	{
+		game::Jump_ClearState(move->ps);
+	}
+
+	__declspec(naked) void pm_jitter_point_stub()
+	{
+		__asm
+		{
+			add esp, 0xC
+
+			pushad
+
+			push esi
+			call jump_clear_state_wrap
+			add esp, 4
+
+			popad
+
+			test eax, eax
+
+			push 0x0422A10
+			retn
+		}
+	}
+
 	class component final : public component_interface
 	{
 	public:
@@ -175,6 +201,9 @@ namespace movement
 			utils::hook::call(0x041F995, pm_trace_stub);
 
 			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
+			utils::hook::set<BYTE>(0x04228C1, 0xEB); // PM_JitterPoint
+
+			utils::hook::jump(0x0422A0B, pm_jitter_point_stub);
 
 			add_movement_commands();
 		}
