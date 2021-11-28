@@ -102,7 +102,7 @@ namespace game
 
 	typedef void(__cdecl* scr_call_t)(int entref);
 
-	enum MeansOfDeath
+	typedef enum
 	{
 		MOD_UNKNOWN = 0,
 		MOD_PISTOL_BULLET = 1,
@@ -121,7 +121,7 @@ namespace game
 		MOD_EXPLOSIVE = 14,
 		MOD_IMPACT = 15,
 		MOD_NUM = 16
-	};
+	} meansOfDeath_t;
 
 	enum scriptType_e
 	{
@@ -381,6 +381,69 @@ namespace game
 		char remoteControlAngles[2];
 		int remoteControlMove;
 	};
+
+	typedef enum
+	{
+		WEAPTYPE_NONE = 0x0,
+		WEAPTYPE_BULLET = 0x1,
+		WEAPTYPE_GRENADE = 0x2,
+		WEAPTYPE_PROJECTILE = 0x3,
+		WEAPTYPE_RIOTSHIELD = 0x4,
+		WEAPTYPE_NUM = 0x5
+	} weapType_t;
+
+	enum PlayerHandIndex
+	{
+		WEAPON_HAND_RIGHT = 0x0,
+		WEAPON_HAND_LEFT = 0x1,
+		NUM_WEAPON_HANDS = 0x2,
+		WEAPON_HAND_DEFAULT = 0x0
+	};
+
+	struct Weapon_s
+	{
+		unsigned int padding : 8;
+		unsigned int scopeVariation : 3;
+		unsigned int weaponOthers : 4;
+		unsigned int weaponUnderBarrels : 2;
+		unsigned int weaponScopes : 3;
+		unsigned int weaponIdx : 8;
+		unsigned int weaponVariation : 4;
+	};
+
+	union Weapon
+	{
+		Weapon_s _s_0;
+		unsigned int data;
+	};
+
+	struct weaponParms
+	{
+		float forward[3];
+		float right[3];
+		float up[3];
+		float muzzleTrace[3];
+		float gunForward[3];
+		Weapon weapon;
+		bool isAlternate;
+		void* weapDef;
+		void* weapCompleteDef;
+	};
+
+	struct BulletFireParams
+	{
+		int weaponEntIndex;
+		int ignoreEntIndex;
+		float damageMultiplier;
+		meansOfDeath_t methodOfDeath;
+		bool noRicochet;
+		float origStart[3];
+		float start[3];
+		float end[3];
+		float dir[3];
+	};
+
+	static_assert(sizeof(BulletFireParams) == 0x44);
 
 	enum EffectiveStance
 	{
@@ -687,45 +750,6 @@ namespace game
 		int hintForcedString;
 	};
 
-	struct trace_t
-	{
-		float fraction;
-		float normal[3];
-		int surfaceFlags;
-		int contents;
-		char material[4];
-		TraceHitType hitType;
-		unsigned __int16 hitId;
-		float fractionForHitType;
-		unsigned __int16 modelIndex;
-		unsigned __int16 partName;
-		unsigned __int16 partGroup;
-		bool allsolid;
-		bool startsolid;
-		bool walkable;
-	};
-
-	static_assert(sizeof(trace_t) == 52);
-
-	struct pml_t
-	{
-		float forward[3];
-		float right[3];
-		float up[3];
-		float frametime;
-		int msec;
-		int walking;
-		int groundPlane;
-		int almostGroundPlane;
-		trace_t groundTrace;
-		float impactSpeed;
-		float previous_origin[3];
-		float previous_velocity[3];
-		int holdrand;
-	};
-
-	static_assert(sizeof(pml_t) == 140);
-
 #pragma pack(push, 1)
 	struct client_s
 	{
@@ -750,4 +774,73 @@ namespace game
 #pragma pack(pop)
 
 	static_assert(sizeof(gentity_s) == 0x274);
+
+	struct TraceExtents
+	{
+		float midPoint[3];
+		float midPointPad;
+		float halfDelta[3];
+		float halfDeltaPad;
+		float halfDeltaAbs[3];
+		float halfDeltaAbsPad;
+		float invDeltaAbs[3];
+		float invDeltaAbsPad;
+		float start[3];
+		float startPad;
+		float end[3];
+		float endPad;
+	};
+
+	static_assert(sizeof(TraceExtents) == 96);
+
+	struct trace_t
+	{
+		float fraction;
+		float normal[3];
+		int surfaceFlags;
+		int contents;
+		char material[4];
+		TraceHitType hitType;
+		unsigned __int16 hitId;
+		float fractionForHitType;
+		unsigned __int16 modelIndex;
+		unsigned __int16 partName;
+		unsigned __int16 partGroup;
+		bool allsolid;
+		bool startsolid;
+		bool walkable;
+	};
+
+	static_assert(sizeof(trace_t) == 52);
+
+	struct BulletTraceResults
+	{
+		trace_t trace;
+		gentity_s* hitEnt;
+		float hitPos[3];
+		bool ignoreHitEnt;
+		int depthSurfaceType;
+		int hitClientNum;
+	};
+
+	static_assert(sizeof(BulletTraceResults) == 80);
+
+	struct pml_t
+	{
+		float forward[3];
+		float right[3];
+		float up[3];
+		float frametime;
+		int msec;
+		int walking;
+		int groundPlane;
+		int almostGroundPlane;
+		trace_t groundTrace;
+		float impactSpeed;
+		float previous_origin[3];
+		float previous_velocity[3];
+		int holdrand;
+	};
+
+	static_assert(sizeof(pml_t) == 140);
 }

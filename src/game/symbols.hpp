@@ -15,6 +15,10 @@ namespace game
 	WEAK symbol<void(gentity_s* ent, float* position, float* orientation)> TeleportPlayer{0x050D840};
 
 	WEAK symbol<void(unsigned int weapon, bool isAlternate, char* output, unsigned int maxStringLen)> BG_GetWeaponNameComplete{0x42F760};
+	WEAK symbol<weapType_t(Weapon, bool)> BG_GetWeaponType{0x0436E30};
+	WEAK symbol<void(unsigned int*)> BG_srand{0x04237A0};
+	WEAK symbol<bool(const unsigned int* const, Weapon, bool)> BG_WeaponBulletFire_ShouldPenetrate{0x0431250};
+	WEAK symbol<bool(const unsigned int* const, Weapon, bool)> BG_WeaponBulletFire_ShouldSpread{0x0438F00};
 
 	WEAK symbol<const char*(int index)> ConcatArgs{0x502150};
 	WEAK symbol<void(int localClientNum, const char* text)> Cbuf_AddText{0x545680};
