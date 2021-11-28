@@ -10,6 +10,7 @@ namespace movement
 	game::dvar_t* player_lastStandCrawlSpeedScale;
 	game::dvar_t* player_duckedSpeedScale;
 	game::dvar_t* player_proneSpeedScale;
+	game::dvar_t* player_activate_slowdown;
 
 	int pm_get_effective_stance(const game::playerState_s* ps) // Inlined on IW5
 	{
@@ -133,6 +134,25 @@ namespace movement
 		}
 	}
 
+	void jump_activate_slowdown_stub(game::playerState_s* ps)
+	{
+		if (player_activate_slowdown->current.enabled)
+		{
+			reinterpret_cast<void (*)(game::playerState_s*)>(0x04161C0)(ps);
+		}
+	}
+
+	int is_prone_allowed_stub()
+	{
+		return TRUE;
+	}
+
+	void pm_trace_stub(game::pmove_t*, game::trace_t*, float*, float*, game::Bounds*,
+		int, int)
+	{
+		return;
+	}
+
 	class component final : public component_interface
 	{
 	public:
@@ -144,10 +164,21 @@ namespace movement
 			utils::hook::call(0x0422D16, pm_cmd_scale_for_stance_stub);
 			utils::hook::call(0x0422D3F, pm_cmd_scale_for_stance_stub);
 
+			utils::hook::call(0x041FA40, jump_activate_slowdown_stub);
+
+			utils::hook::call(0x041F793, is_prone_allowed_stub);
+
+			utils::hook::call(0x041F83C, pm_trace_stub);
+			utils::hook::call(0x041F941, pm_trace_stub);
+			utils::hook::call(0x041F995, pm_trace_stub);
+			utils::hook::call(0x041F8D8, pm_trace_stub);
+			utils::hook::call(0x041F995, pm_trace_stub);
+
 			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
 
 			add_movement_commands();
 		}
+
 	private:
 		static void add_movement_commands()
 		{
@@ -199,6 +230,9 @@ namespace movement
 			player_proneSpeedScale = game::Dvar_RegisterFloat("player_proneSpeedScale", 0.15f, 0.0f, 5.0f,
 				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
 				"The scale applied to the player speed when crawling");
+			player_activate_slowdown = game::Dvar_RegisterBool("player_activate_slowdown", true,
+				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
+				"Slow the player down");
 		}
 	};
 }

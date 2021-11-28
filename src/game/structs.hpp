@@ -104,6 +104,33 @@ namespace game
 
 	typedef enum
 	{
+		ANIM_ET_PAIN,
+		ANIM_ET_DEATH,
+		ANIM_ET_FIREWEAPON,
+		ANIM_ET_JUMP,
+		ANIM_ET_JUMPBK,
+		ANIM_ET_LAND,
+		ANIM_ET_DROPWEAPON,
+		ANIM_ET_RAISEWEAPON,
+		ANIM_ET_CLIMB_MOUNT,
+		ANIM_ET_CLIMB_DISMOUNT,
+		ANIM_ET_RELOAD,
+		ANIM_ET_CROUCH_TO_PRONE,
+		ANIM_ET_PRONE_TO_CROUCH,
+		ANIM_ET_STAND_TO_CROUCH,
+		ANIM_ET_CROUCH_TO_STAND,
+		ANIM_ET_STAND_TO_PRONE,
+		ANIM_ET_PRONE_TO_STAND,
+		ANIM_ET_MELEEATTACK,
+		ANIM_ET_KNIFE_MELEE,
+		ANIM_ET_KNIFE_MELEE_CHARGE,
+		ANIM_ET_SHELLSHOCK,
+		ANIM_ET_STUNNED,
+		NUM_ANIM_EVENTTYPES
+	} scriptAnimEventTypes_t;
+
+	typedef enum
+	{
 		MOD_UNKNOWN = 0,
 		MOD_PISTOL_BULLET = 1,
 		MOD_RIFLE_BULLET = 2,
@@ -648,6 +675,12 @@ namespace game
 		char __pad0[11752];
 	};
 
+	struct Bounds
+	{
+		float midPoint[3];
+		float halfSize[3];
+	};
+
 	struct pmove_t
 	{
 		playerState_s* ps;
@@ -656,7 +689,7 @@ namespace game
 		int tracemask;
 		int numtouch;
 		int touchents[32];
-		char bounds[24];
+		Bounds bounds;
 		float speed;
 		int proneChange;
 		float maxSprintTimeMultiplier;

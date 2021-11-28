@@ -127,8 +127,7 @@ namespace command
 					return;
 				}
 
-				const auto input = params.get(1);
-				const auto playerNum = std::atoi(input);
+				const auto playerNum = std::atoi(params.get(1));
 				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
 				if (playerNum >= max)
@@ -154,8 +153,7 @@ namespace command
 					return;
 				}
 
-				const auto input = params.get(1);
-				const auto playerNum = std::atoi(input);
+				const auto playerNum = std::atoi(params.get(1));
 				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
 				if (playerNum >= max)
@@ -186,8 +184,7 @@ namespace command
 					return;
 				}
 
-				const auto input = params.get(1);
-				const auto playerNum = std::atoi(input);
+				const auto playerNum = std::atoi(params.get(1));
 				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
 				if (playerNum >= max)

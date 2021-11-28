@@ -5,7 +5,6 @@
 namespace game
 {
 	// Functions
-
 	WEAK symbol<void(int type, VariableUnion u)> AddRefToValue{0x5656E0};
 	WEAK symbol<void(unsigned int id)> AddRefToObject{0x5655F0};
 	WEAK symbol<unsigned int(unsigned int id)> AllocThread{0x565580};
@@ -14,7 +13,9 @@ namespace game
 	WEAK symbol<int(void*)> BG_GetMaxSprintTime{0x041BA70};
 	WEAK symbol<void(gentity_s* ent, float* position, float* orientation)> TeleportPlayer{0x050D840};
 
-	WEAK symbol<void(unsigned int weapon, bool isAlternate, char* output, unsigned int maxStringLen)> BG_GetWeaponNameComplete{0x42F760};
+	WEAK symbol<void(playerState_s*)> Jump_ClearState{0x04160F0};
+	WEAK symbol<void(playerState_s*)> PM_ExitAimDownSight{0x0428050};
+	WEAK symbol<void(unsigned int weapon, bool isAlternate, char* output, unsigned int maxStringLen)> BG_GetWeaponNameComplete{0x042F760};
 	WEAK symbol<weapType_t(Weapon, bool)> BG_GetWeaponType{0x0436E30};
 	WEAK symbol<void(unsigned int*)> BG_srand{0x04237A0};
 	WEAK symbol<bool(const unsigned int* const, Weapon, bool)> BG_WeaponBulletFire_ShouldPenetrate{0x0431250};
@@ -89,7 +90,6 @@ namespace game
 	WEAK symbol<void*(int, const char*, int)> DB_FindXAssetHeader{0x04CA620};
 
 	// Variables
-
 	WEAK symbol<CmdArgs> cmd_args{0x1C978D0};
 
 	WEAK symbol<int> g_script_error_level{0x20B21FC};
