@@ -11,6 +11,7 @@ namespace movement
 	game::dvar_t* player_duckedSpeedScale;
 	game::dvar_t* player_proneSpeedScale;
 	game::dvar_t* player_activate_slowdown;
+	game::dvar_t* sv_enableElevators;
 
 	int pm_get_effective_stance(const game::playerState_s* ps) // Inlined on IW5
 	{
@@ -147,35 +148,81 @@ namespace movement
 		return TRUE;
 	}
 
-	void pm_trace_stub(game::pmove_t*, game::trace_t*, float*, float*, game::Bounds*,
-		int, int)
-	{
-		return;
-	}
-
-	void jump_clear_state_wrap(game::pmove_t* move)
-	{
-		game::Jump_ClearState(move->ps);
-	}
-
-	__declspec(naked) void pm_jitter_point_stub()
+	__declspec(naked) void pm_check_duck_stub()
 	{
 		__asm
 		{
-			add esp, 0xC
+			push eax
+			mov eax, sv_enableElevators
+			cmp byte ptr [eax + 12], 1
+			pop eax
 
-			pushad
+			je stand // Always stand if sv_enableElevators is true
 
-			push esi
-			call jump_clear_state_wrap
-			add esp, 4
-
-			popad
-
-			test eax, eax
-
-			push 0x0422A10
+			cmp byte ptr [esp + 0x38], 0
+			push 0x041F94E
 			retn
+
+		stand:
+			push 0x041F950
+			retn
+		}
+	}
+
+	__declspec(naked) void pm_jitter_point_stub_1()
+	{
+		__asm
+		{
+			push eax
+			mov eax, sv_enableElevators
+			cmp byte ptr [eax + 12], 1
+			pop eax
+
+			je skipJump
+
+			cmp byte ptr [ebp + 0x29], 0
+			jnz originalCode
+
+		skipJump:
+			push 0x042286F
+			retn
+
+		originalCode:
+			push 0x04228C3
+			retn
+		}
+	}
+
+	__declspec(naked) void pm_jitter_point_stub_2()
+	{
+		__asm
+		{
+			push eax
+			mov eax, sv_enableElevators
+			cmp byte ptr [eax + 12], 1
+			pop eax
+
+			je jumpOver
+
+			cmp byte ptr [ebp + 0x29], 0
+			jz jumpOver
+
+			push 0x04228C3
+			retn
+
+		jumpOver:
+			push 0x04228E6
+			retn
+		}
+	}
+
+	void pm_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* const f3, const float* const f4,
+		const game::Bounds* bounds, int a6, int a7)
+	{
+		if (!sv_enableElevators->current.enabled)
+		{
+			reinterpret_cast<void (*)(game::pmove_t*, game::trace_t*, const float* const,
+				const float* const, const game::Bounds*, int, int)>(0x0421F00)(move, trace, f3, f4, bounds, a6, a7);
 		}
 	}
 
@@ -194,18 +241,19 @@ namespace movement
 
 			utils::hook::call(0x041F793, is_prone_allowed_stub);
 
+			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
+
 			utils::hook::call(0x041F83C, pm_trace_stub);
 			utils::hook::call(0x041F941, pm_trace_stub);
 			utils::hook::call(0x041F995, pm_trace_stub);
 			utils::hook::call(0x041F8D8, pm_trace_stub);
 			utils::hook::call(0x041F995, pm_trace_stub);
 
-			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
+			utils::hook::jump(0x0422869, pm_jitter_point_stub_1); // I don't know
+			utils::hook::nop(0x042286E, 1);
 
-			utils::hook::set<BYTE>(0x04228C1, 0xEB); // PM_JitterPoint
-			utils::hook::nop(0x042286D, 2); // PM_JitterPoint
-
-			utils::hook::jump(0x0422A0B, pm_jitter_point_stub);
+			utils::hook::jump(0x04228BD, pm_jitter_point_stub_2); // IW4 code flow
+			utils::hook::nop(0x04228C2, 1);
 
 			add_movement_commands();
 		}
@@ -264,6 +312,9 @@ namespace movement
 			player_activate_slowdown = game::Dvar_RegisterBool("player_activate_slowdown", true,
 				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
 				"Slow the player down");
+			sv_enableElevators = game::Dvar_RegisterBool("sv_enableElevators", false,
+				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
+				"sv_enableElevators");
 		}
 	};
 }
