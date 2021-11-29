@@ -148,27 +148,6 @@ namespace movement
 		return TRUE;
 	}
 
-	__declspec(naked) void pm_check_duck_stub()
-	{
-		__asm
-		{
-			push eax
-			mov eax, sv_enableElevators
-			cmp byte ptr [eax + 12], 1
-			pop eax
-
-			je stand // Always stand if sv_enableElevators is true
-
-			cmp byte ptr [esp + 0x38], 0
-			push 0x041F94E
-			retn
-
-		stand:
-			push 0x041F950
-			retn
-		}
-	}
-
 	__declspec(naked) void pm_jitter_point_stub_1()
 	{
 		__asm

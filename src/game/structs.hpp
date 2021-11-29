@@ -828,13 +828,13 @@ namespace game
 
 	static_assert(sizeof(TraceExtents) == 96);
 
+#pragma pack(push, 1)
 	struct trace_t
 	{
 		float fraction;
 		float normal[3];
 		int surfaceFlags;
 		int contents;
-		char material[4];
 		TraceHitType hitType;
 		unsigned __int16 hitId;
 		float fractionForHitType;
@@ -845,8 +845,7 @@ namespace game
 		bool startsolid;
 		bool walkable;
 	};
-
-	static_assert(sizeof(trace_t) == 52);
+#pragma pack(pop)
 
 	struct BulletTraceResults
 	{
@@ -857,8 +856,6 @@ namespace game
 		int depthSurfaceType;
 		int hitClientNum;
 	};
-
-	static_assert(sizeof(BulletTraceResults) == 80);
 
 	struct pml_t
 	{
@@ -876,6 +873,4 @@ namespace game
 		float previous_velocity[3];
 		int holdrand;
 	};
-
-	static_assert(sizeof(pml_t) == 140);
 }
