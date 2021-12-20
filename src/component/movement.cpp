@@ -240,7 +240,7 @@ namespace movement
 	private:
 		static void add_movement_commands()
 		{
-			command::add("teleport_player", [](const command::params& params)
+			command::add("teleportPlayer", [](const command::params& params)
 			{
 				if (params.size() < 5) return;
 
@@ -254,7 +254,7 @@ namespace movement
 				game::TeleportPlayer(ent, newOrigin, neutralViewAngle);
 			});
 
-			command::add("force_last_stand", [](const command::params& params)
+			command::add("forceLastStand", [](const command::params& params)
 			{
 				if (params.size() < 2) return;
 
@@ -266,7 +266,7 @@ namespace movement
 				g_client->lastStandTime = 0;
 			});
 
-			command::add("marathon_perk", [](const command::params& params)
+			command::add("marathonPerk", [](const command::params& params)
 			{
 				if (params.size() < 2) return;
 

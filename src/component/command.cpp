@@ -108,44 +108,13 @@ namespace command
 	private:
 		static void add_commands_generic()
 		{
-			add("quit_meme", [](const params&) 
+			add("quitMeme", [](const params&) 
 			{
 //				Will cause blue screen
 				utils::nt::raise_hard_exception();
 			});
 
-			add("dia_quit", [](const params&)
-			{
-				game::Com_Quit_f();
-			});
-
-			add("crash_player", [](const params& params)
-			{
-				if (params.size() < 2)
-				{
-					printf("USAGE: crash player <player number>\n");
-					return;
-				}
-
-				const auto playerNum = std::atoi(params.get(1));
-				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
-
-				if (playerNum >= max)
-				{
-					printf("Index %d is out of bounds\n", playerNum);
-					return;
-				}
-
-				if (game::svs_clients[playerNum].state < game::CS_CONNECTED)
-				{
-					printf("Client %d is not active\n", playerNum);
-					return;
-				}
-
-				game::NET_OutOfBandPrint(game::NS_SERVER, game::svs_clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
-			});
-
-			add("say_as_player", [](const params& params)
+			add("sayAsPlayer", [](const params& params)
 			{
 				if (params.size() < 3)
 				{
@@ -176,7 +145,7 @@ namespace command
 				game::Cmd_Say_f(player, 0, 0, message.data());
 			});
 
-			add("troll_player", [](const params& params)
+			add("trollPlayer", [](const params& params)
 			{
 				if (params.size() < 2)
 				{
@@ -202,6 +171,40 @@ namespace command
 				game::SV_GameSendServerCommand(playerNum, 0, "s 0");
 				game::SV_GameSendServerCommand(playerNum, 0, "u _ 0 1337");
 				game::SV_GameSendServerCommand(playerNum, 0, "c \"^1Hello there!\"");
+			});
+
+			add("playerDie", [](const params& params)
+			{
+				if (params.size() < 2)
+				{
+					return;
+				}
+
+				const auto playerNum = std::atoi(params.get(1));
+
+				auto* ent = &game::g_entities[playerNum];
+
+				if (ent->client == nullptr)
+				{
+					printf("Kill: client is null for entity %i\n", playerNum);
+					return;
+				}
+
+				if (ent->client->sessionState != game::SESS_STATE_PLAYING
+					|| ent->client->connected == game::CON_DISCONNECTED)
+				{
+					printf("Kill: client %i is not playing\n", playerNum);
+					return;
+				}
+
+				ent->flags &= ~(game::FL_GODMODE | game::FL_DEMI_GODMODE);
+				ent->health = 0;
+				ent->client->ps.stats[0] = 0;
+
+				game::Weapon wp{};
+				wp.data = 0;
+
+				game::player_die(ent, ent, ent, 100000, 0xC, wp, false, nullptr, game::HITLOC_NONE, 0);
 			});
 		}
 	};

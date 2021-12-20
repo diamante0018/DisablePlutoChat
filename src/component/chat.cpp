@@ -61,7 +61,7 @@ namespace chat
     private:
         static void add_chat_commands()
         {
-            command::add("mute_player", [](const command::params& params)
+            command::add("mutePlayer", [](const command::params& params)
             {
                 if (params.size() < 2)
                 {
@@ -88,7 +88,7 @@ namespace chat
                 chat::mute_list.insert(playerNum);
             });
 
-            command::add("unmute_player", [](const command::params& params)
+            command::add("unmutePlayer", [](const command::params& params)
             {
                 if (params.size() < 2)
                 {

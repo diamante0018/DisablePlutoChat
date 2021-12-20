@@ -20,6 +20,8 @@ namespace game
 	WEAK symbol<void(unsigned int*)> BG_srand{0x04237A0};
 	WEAK symbol<bool(const unsigned int* const, Weapon, bool)> BG_WeaponBulletFire_ShouldPenetrate{0x0431250};
 	WEAK symbol<bool(const unsigned int* const, Weapon, bool)> BG_WeaponBulletFire_ShouldSpread{0x0438F00};
+	WEAK symbol<void(gentity_s*, const gentity_s*, gentity_s*,
+		int, int, Weapon, bool, const float*, hitLocation_t, int)> player_die{0x0503460};
 
 	WEAK symbol<const char*(int index)> ConcatArgs{0x502150};
 	WEAK symbol<void(int localClientNum, const char* text)> Cbuf_AddText{0x545680};
@@ -29,8 +31,8 @@ namespace game
 	WEAK symbol<void(const char* cmdName)> Cmd_RemoveCommand{0x545E20};
 	WEAK symbol<const char*(int index)> Cmd_Argv{0x467600};
 	WEAK symbol<void()> SV_DisconnectAllClients{0x05749E0};
-	WEAK symbol<void(game::client_s *drop, const char *reason, int notifyOthers)> SV_DropClientInternal{0x0570980};
-	WEAK symbol<void(game::client_s* drop, const char* reason)> SV_DelayDropClient{0x0570BB0};
+	WEAK symbol<void(client_s *drop, const char *reason, int notifyOthers)> SV_DropClientInternal{0x0570980};
+	WEAK symbol<void(client_s* drop, const char* reason)> SV_DelayDropClient{0x0570BB0};
 
 	WEAK symbol<dvar_t*(const char*)> Dvar_FindVar{0x5BDCC0};
 	WEAK symbol<dvar_t*(const char* dvarName, int value, int min, int max, unsigned short flags, const char* desc)>
@@ -42,7 +44,6 @@ namespace game
 	WEAK symbol<dvar_t*(const char* dvarName, float value, float min, float max, unsigned short flags, const char* description)>
 		Dvar_RegisterFloat{0x05BEA80};
 	WEAK symbol<void(const char* name, const char* value)> Dvar_SetStringByName{0x05BF660};
-	WEAK symbol<void(game::dvar_t* var, game::DvarValue value, int force)> Dvar_SetVariant{0x05BD920};
 
 	WEAK symbol<const char*(const char* s, const char* key)> Info_ValueForKey{0x05C2DB0};
 	WEAK symbol<void(char* s, const char* key)> Info_RemoveKey{0x05C2F50};
@@ -78,8 +79,8 @@ namespace game
 	WEAK symbol<void*(jmp_buf* Buf, int Value)> longjmp{0x7363BC};
 	WEAK symbol<int(jmp_buf* Buf)> _setjmp{0x734CF8};
 
-	WEAK symbol<bool(netsrc_t, game::netadr_s dest, const char* message)> NET_OutOfBandPrint{0x055C830};
-	WEAK symbol<void(game::gentity_s* ent, int a2, int which_chat, const char* message)> Cmd_Say_f{0x0502B60};
+	WEAK symbol<bool(netsrc_t, netadr_s dest, const char* message)> NET_OutOfBandPrint{0x055C830};
+	WEAK symbol<void(gentity_s* ent, int a2, int which_chat, const char* message)> Cmd_Say_f{0x0502B60};
 	WEAK symbol<void()> Com_Quit_f{0x05556B0};
 	WEAK symbol<void(int index, char* buffer, int bufferSize)> SV_GetUserinfo{0x0573E00};
 	WEAK symbol<bool(const char* s)> Info_Validate{0x05C3140};

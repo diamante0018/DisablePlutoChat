@@ -42,6 +42,31 @@ namespace game
 
 	typedef enum
 	{
+		HITLOC_NONE,
+		HITLOC_HELMET,
+		HITLOC_HEAD,
+		HITLOC_NECK,
+		HITLOC_TORSO_UPR,
+		HITLOC_TORSO_LWR,
+		HITLOC_R_ARM_UPR,
+		HITLOC_L_ARM_UPR,
+		HITLOC_R_ARM_LWR,
+		HITLOC_L_ARM_LWR,
+		HITLOC_R_HAND,
+		HITLOC_L_HAND,
+		HITLOC_R_LEG_UPR,
+		HITLOC_L_LEG_UPR,
+		HITLOC_R_LEG_LWR,
+		HITLOC_L_LEG_LWR,
+		HITLOC_R_FOOT,
+		HITLOC_L_FOOT,
+		HITLOC_GUN,
+		HITLOC_SHIELD,
+		HITLOC_NUM
+	} hitLocation_t;
+
+	typedef enum
+	{
 		NS_CLIENT1 = 0,
 		NS_CLIENT2 = 1,
 		NS_CLIENT3 = 2,
@@ -710,11 +735,52 @@ namespace game
 
 	static_assert(sizeof(playerState_s) == 13056);
 
+	enum entityFlag
+	{
+		FL_GODMODE = 0x1,
+		FL_DEMI_GODMODE = 0x2,
+		FL_NOTARGET = 0x4,
+		FL_NO_KNOCKBACK = 0x8,
+		FL_NO_RADIUS_DAMAGE = 0x10,
+		FL_SUPPORTS_LINKTO = 0x1000,
+		FL_NO_AUTO_ANIM_UPDATE = 0x2000,
+		FL_GRENADE_TOUCH_DAMAGE = 0x4000,
+		FL_STABLE_MISSILES = 0x20000,
+		FL_REPEAT_ANIM_UPDATE = 0x40000,
+		FL_VEHICLE_TARGET = 0x80000,
+		FL_GROUND_ENT = 0x100000,
+		FL_CURSOR_HINT = 0x200000,
+		FL_MISSILE_ATTRACTOR = 0x800000,
+		FL_WEAPON_BEING_GRABBED = 0x1000000,
+		FL_DELETE = 0x2000000,
+		FL_BOUNCE = 0x4000000,
+		FL_MOVER_SLIDE = 0x8000000
+	};
+
+	typedef enum
+	{
+		SESS_STATE_PLAYING = 0x0,
+		SESS_STATE_DEAD = 0x1,
+		SESS_STATE_SPECTATOR = 0x2,
+		SESS_STATE_INTERMISSION = 0x3
+	} sessionState_t;
+
+	typedef enum
+	{
+		CON_DISCONNECTED = 0x0,
+		CON_CONNECTING = 0x1,
+		CON_CONNECTED = 0x2
+	} clientConnected_t;
+
 	struct gclient_s
 	{
 		playerState_s ps;
-		char __pad0[716];
-		int flags;
+		char __pad0[12];
+		sessionState_t sessionState; // 13068
+		char __pad1[40];
+		clientConnected_t connected; // 13112
+		char __pad2[656]; // 13056
+		int flags; // 13772
 		int spectatorClient;
 		int lastCmdTime;
 //		int mpviewer; // Debug ?
@@ -796,19 +862,31 @@ namespace game
 
 	static_assert(sizeof(client_s) == 0x78698);
 
+	struct EntHandle
+	{
+		unsigned __int16 number;
+		unsigned __int16 infoIndex;
+	};
+
 	struct gentity_s
 	{
 		int entnum;
-		char __pad0[0x154];
-		gclient_s* client;
-		char __pad1[0x28];
+		char __pad0[340];
+		gclient_s* client; // 344
+		char __pad1[40];
 		int flags;
-		char __pad2[0xEC];
+		int eventTime;
+		int clipmask;
+		int processedFrame;
+		EntHandle parent;
+		int nextthink;
+		int health;
+		char __pad2[212];
 	};
 
 #pragma pack(pop)
 
-	static_assert(sizeof(gentity_s) == 0x274);
+	static_assert(sizeof(gentity_s) == 628);
 
 	struct TraceExtents
 	{
