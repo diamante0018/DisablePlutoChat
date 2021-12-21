@@ -148,60 +148,25 @@ namespace movement
 		return TRUE;
 	}
 
-	__declspec(naked) void pm_jitter_point_stub_1()
-	{
-		__asm
-		{
-			push eax
-			mov eax, sv_enableElevators
-			cmp byte ptr [eax + 12], 1
-			pop eax
-
-			je skipJump
-
-			cmp byte ptr [ebp + 0x29], 0
-			jnz originalCode
-
-		skipJump:
-			push 0x042286F
-			retn
-
-		originalCode:
-			push 0x04228C3
-			retn
-		}
-	}
-
-	__declspec(naked) void pm_jitter_point_stub_2()
-	{
-		__asm
-		{
-			push eax
-			mov eax, sv_enableElevators
-			cmp byte ptr [eax + 12], 1
-			pop eax
-
-			je jumpOver
-
-			cmp byte ptr [ebp + 0x29], 0
-			jz jumpOver
-
-			push 0x04228C3
-			retn
-
-		jumpOver:
-			push 0x04228E6
-			retn
-		}
-	}
-
-	void pm_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* const f3, const float* const f4,
+	void pm_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* f3, const float* f4,
 		const game::Bounds* bounds, int a6, int a7)
 	{
-		if (!sv_enableElevators->current.enabled)
+		game::PM_trace(move, trace, f3, f4, bounds, a6, a7);
+
+		if (sv_enableElevators->current.enabled)
 		{
-			reinterpret_cast<void (*)(game::pmove_t*, game::trace_t*, const float* const,
-				const float* const, const game::Bounds*, int, int)>(0x0421F00)(move, trace, f3, f4, bounds, a6, a7);
+			trace->allsolid = false;
+		}
+	}
+
+	void pm_player_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* f3,
+		const float* f4, const game::Bounds* bounds, int a6, int a7)
+	{
+		game::PM_playerTrace(move, trace, f3, f4, bounds, a6, a7);
+
+		if (sv_enableElevators->current.enabled)
+		{
+			trace->startsolid = false;
 		}
 	}
 
@@ -222,17 +187,10 @@ namespace movement
 
 			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
 
-			utils::hook::call(0x041F83C, pm_trace_stub);
-			utils::hook::call(0x041F941, pm_trace_stub);
-			utils::hook::call(0x041F995, pm_trace_stub);
-			utils::hook::call(0x041F8D8, pm_trace_stub);
 			utils::hook::call(0x041F995, pm_trace_stub);
 
-			utils::hook::jump(0x0422869, pm_jitter_point_stub_1); // I don't know
-			utils::hook::nop(0x042286E, 1);
-
-			utils::hook::jump(0x04228BD, pm_jitter_point_stub_2); // IW4 code flow
-			utils::hook::nop(0x04228C2, 1);
+			utils::hook::call(0x0422861, pm_player_trace_stub);
+			utils::hook::call(0x04228B5, pm_player_trace_stub);
 
 			add_movement_commands();
 		}

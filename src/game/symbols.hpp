@@ -13,6 +13,10 @@ namespace game
 	WEAK symbol<int(void*)> BG_GetMaxSprintTime{0x041BA70};
 	WEAK symbol<void(gentity_s* ent, float* position, float* orientation)> TeleportPlayer{0x050D840};
 
+	WEAK symbol<void(pmove_t*, trace_t*, const float*,
+		const float*, const Bounds*, int, int)> PM_playerTrace{0x0421F00};
+	WEAK symbol<void(const pmove_t* move, trace_t* trace, const float*,
+		const float*, const Bounds*, int, int)> PM_trace{0x041CEB0};
 	WEAK symbol<void(playerState_s*)> Jump_ClearState{0x04160F0};
 	WEAK symbol<void(playerState_s*)> PM_ExitAimDownSight{0x0428050};
 	WEAK symbol<void(unsigned int weapon, bool isAlternate, char* output, unsigned int maxStringLen)> BG_GetWeaponNameComplete{0x042F760};
@@ -107,4 +111,6 @@ namespace game
 	WEAK symbol<unsigned int> gameEntityId{0x208E1A8};
 
 	WEAK symbol<client_s> svs_clients{0x4B5CF90};
+
+	WEAK symbol<bgs_t> level_bgs{0x1BA0EA0};
 }

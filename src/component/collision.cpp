@@ -95,9 +95,6 @@ namespace collision
 			utils::hook::jump(0x05413AF, player_collision_stub);
 			utils::hook::jump(0x04F9EF2, player_ejection_stub);
 			utils::hook::jump(0x0424D51, bounce_stub);
-
-			utils::hook::set<BYTE>(0x061915F, 0xEB); // Enable elevators, I think
-			utils::hook::set<BYTE>(0x042286D, 0xEB);
 		}
 	};
 }

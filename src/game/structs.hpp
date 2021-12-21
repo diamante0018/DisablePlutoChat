@@ -951,4 +951,8 @@ namespace game
 		float previous_velocity[3];
 		int holdrand;
 	};
+
+	struct bgs_t
+	{
+	};
 }
