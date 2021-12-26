@@ -906,16 +906,15 @@ namespace game
 
 	static_assert(sizeof(TraceExtents) == 96);
 
-#pragma pack(push, 1)
 	struct trace_t
 	{
 		float fraction;
 		float normal[3];
 		int surfaceFlags;
 		int contents;
+		const char* material;
 		TraceHitType hitType;
 		unsigned __int16 hitId;
-		float fractionForHitType;
 		unsigned __int16 modelIndex;
 		unsigned __int16 partName;
 		unsigned __int16 partGroup;
@@ -923,7 +922,8 @@ namespace game
 		bool startsolid;
 		bool walkable;
 	};
-#pragma pack(pop)
+
+	static_assert(sizeof(trace_t) == 0x2C);
 
 	struct BulletTraceResults
 	{

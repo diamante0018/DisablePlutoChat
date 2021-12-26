@@ -13,27 +13,6 @@ namespace movement
 	game::dvar_t* player_activate_slowdown;
 	game::dvar_t* sv_enableElevators;
 
-	int pm_get_effective_stance(const game::playerState_s* ps) // Inlined on IW5
-	{
-		const auto heightTarget = ps->viewHeightTarget;
-		if (heightTarget == 0x16)
-		{
-			return game::PM_EFF_STANCE_LASTSTANDCRAWL;
-		}
-
-		if (heightTarget == 0x28)
-		{
-			return game::PM_EFF_STANCE_DUCKED;
-		}
-
-		if (heightTarget == 0xB)
-		{
-			return game::PM_EFF_STANCE_PRONE;
-		}
-
-		return game::PM_EFF_STANCE_DEFAULT;
-	}
-
 	float pm_cmd_scale_for_stance(game::pmove_t* move)
 	{
 		float scale{};
@@ -96,7 +75,7 @@ namespace movement
 		}
 
 		scale = 1.0f;
-		auto stance = pm_get_effective_stance(playerState);
+		auto stance = game::PM_GetEffectiveStance(playerState);
 
 		if (stance == game::PM_EFF_STANCE_PRONE)
 		{
