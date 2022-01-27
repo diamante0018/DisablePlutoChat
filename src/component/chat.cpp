@@ -8,12 +8,13 @@
 
 namespace chat
 {
-    std::unordered_set<std::int32_t> mute_list{};
-    game::dvar_t* sv_EnableGameChat;
+    std::mutex access_mutex;
+    static std::unordered_set<std::int32_t> mute_list{};
+    game::dvar_t* sv_enableGameChat;
 
     void client_command_stub(int clientNum)
     {
-        char cmd[1024] = {0};
+        char cmd[1024]{};
         game::gentity_s* ent = &game::g_entities[clientNum];
         if (ent->client == nullptr)
         {
@@ -23,16 +24,10 @@ namespace chat
 
         game::SV_Cmd_ArgvBuffer(0, cmd, sizeof(cmd));
 
-        if (utils::string::starts_with(cmd, "die"))
-        {
-            game::Dvar_SetStringByName("sv_iw4madmin_command", utils::string::va("kill;%d", clientNum));
-            game::Cbuf_InsertText(0, utils::string::va("tell %d \"You have commited suicide\"", clientNum));
-            return;
-        }
-
         if (utils::string::starts_with(cmd, "say"))
         {
-            if (!sv_EnableGameChat->current.enabled || mute_list.contains(clientNum))
+            std::unique_lock<std::mutex> _(access_mutex);
+            if (!sv_enableGameChat->current.enabled || mute_list.contains(clientNum))
             {
                 game::Cbuf_InsertText(0, utils::string::va("tell %d \"You are not allowed to type in the chat\"", clientNum));
                 return;
@@ -50,18 +45,13 @@ namespace chat
             utils::hook::call(0x057192A, client_command_stub);
             add_chat_commands();
 
-            sv_EnableGameChat = game::Dvar_RegisterBool("sv_EnableGameChat", true, game::DVAR_FLAG_NONE, "Enables global and team chat");
-        }
-
-        void pre_destroy() override
-        {
-            mute_list.clear();
+            sv_enableGameChat = game::Dvar_RegisterBool("sv_enableGameChat", true, game::SERVERINFO, "Enable game chat");
         }
 
     private:
         static void add_chat_commands()
         {
-            command::add("mute_player", [](const command::params& params)
+            command::add("mutePlayer", [](const command::params& params)
             {
                 if (params.size() < 2)
                 {
@@ -79,16 +69,17 @@ namespace chat
                     return;
                 }
 
-                if (chat::mute_list.contains(playerNum))
+                std::unique_lock<std::mutex> _(access_mutex);
+                if (mute_list.contains(playerNum))
                 {
                     printf("Client number %d is already muted\n", playerNum);
                     return;
                 }
 
-                chat::mute_list.insert(playerNum);
+                mute_list.insert(playerNum);
             });
 
-            command::add("unmute_player", [](const command::params& params)
+            command::add("unmutePlayer", [](const command::params& params)
             {
                 if (params.size() < 2)
                 {
@@ -106,13 +97,14 @@ namespace chat
                     return;
                 }
 
-                if (!chat::mute_list.contains(playerNum))
+                std::unique_lock<std::mutex> _(access_mutex);
+                if (!mute_list.contains(playerNum))
                 {
                     printf("Client number %d is not muted\n", playerNum);
                     return;
                 }
 
-                chat::mute_list.erase(playerNum);
+                mute_list.erase(playerNum);
             });
         }
     };

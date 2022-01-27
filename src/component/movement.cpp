@@ -11,50 +11,21 @@ namespace movement
 	game::dvar_t* player_duckedSpeedScale;
 	game::dvar_t* player_proneSpeedScale;
 	game::dvar_t* player_activate_slowdown;
-	game::dvar_t* sv_enableElevators;
+	game::dvar_t* bg_elevators;
 
-	int pm_get_effective_stance(const game::playerState_s* ps) // Inlined on IW5
+	float pm_cmd_scale_for_stance(const game::pmove_t* pm)
 	{
-		const auto heightTarget = ps->viewHeightTarget;
-		if (heightTarget == 0x16)
-		{
-			return game::PM_EFF_STANCE_LASTSTANDCRAWL;
-		}
+		assert(pm->ps != nullptr);
 
-		if (heightTarget == 0x28)
-		{
-			return game::PM_EFF_STANCE_DUCKED;
-		}
-
-		if (heightTarget == 0xB)
-		{
-			return game::PM_EFF_STANCE_PRONE;
-		}
-
-		return game::PM_EFF_STANCE_DEFAULT;
-	}
-
-	float pm_cmd_scale_for_stance(game::pmove_t* move)
-	{
 		float scale{};
-		const auto* playerState = move->ps;
+		const auto* playerState = pm->ps;
 
 		if (playerState->viewHeightLerpTime != 0 && playerState->viewHeightLerpTarget == 0xB)
 		{
-			scale = move->cmd.serverTime - playerState->viewHeightLerpTime / 400.0f;
+			scale = pm->cmd.serverTime - playerState->viewHeightLerpTime / 400.0f;
 			if (0.0f <= scale)
 			{
-				auto flags = 0;
-				if (scale < 1.0f)
-				{
-					flags |= 1 << 8;
-				}
-				if (scale == 1.0f)
-				{
-					flags |= 1 << 14;
-				}
-
-				if (flags == 0)
+				if (scale > 1.0f)
 				{
 					scale = 1.0f;
 					return scale * 0.15f + (1.0f - scale) * 0.65f;
@@ -70,21 +41,10 @@ namespace movement
 		if ((playerState->viewHeightLerpTime != 0 && playerState->viewHeightLerpTarget == 0x28) &&
 			playerState->viewHeightLerpDown == 0)
 		{
-			scale = 400.0f / move->cmd.serverTime - playerState->viewHeightLerpTime;
+			scale = 400.0f / pm->cmd.serverTime - playerState->viewHeightLerpTime;
 			if (0.0f <= scale)
 			{
-				auto flags = 0;
-				if (scale < 1.0f)
-				{
-					flags |= 1 << 8;
-				}
-
-				if (scale == 1.0f)
-				{
-					flags |= 1 << 14;
-				}
-
-				if (flags == 0)
+				if (scale > 1.0f)
 				{
 					scale = 1.0f;
 				}
@@ -96,7 +56,7 @@ namespace movement
 		}
 
 		scale = 1.0f;
-		auto stance = pm_get_effective_stance(playerState);
+		const auto stance = game::PM_GetEffectiveStance(playerState);
 
 		if (stance == game::PM_EFF_STANCE_PRONE)
 		{
@@ -153,7 +113,7 @@ namespace movement
 		__asm
 		{
 			push eax
-			mov eax, sv_enableElevators
+			mov eax, bg_elevators
 			cmp byte ptr [eax + 12], 1
 			pop eax
 
@@ -177,7 +137,7 @@ namespace movement
 		__asm
 		{
 			push eax
-			mov eax, sv_enableElevators
+			mov eax, bg_elevators
 			cmp byte ptr [eax + 12], 1
 			pop eax
 
@@ -198,7 +158,7 @@ namespace movement
 	void pm_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* const f3, const float* const f4,
 		const game::Bounds* bounds, int a6, int a7)
 	{
-		if (!sv_enableElevators->current.enabled)
+		if (!bg_elevators->current.enabled)
 		{
 			reinterpret_cast<void (*)(game::pmove_t*, game::trace_t*, const float* const,
 				const float* const, const game::Bounds*, int, int)>(0x0421F00)(move, trace, f3, f4, bounds, a6, a7);
@@ -240,20 +200,6 @@ namespace movement
 	private:
 		static void add_movement_commands()
 		{
-			command::add("teleport_player", [](const command::params& params)
-			{
-				if (params.size() < 5) return;
-
-				const auto ent = &game::g_entities[std::atoi(params.get(1))];
-				game::vec3_t newOrigin{};
-				game::vec3_t neutralViewAngle{ 0.0f, 0.0f, 0.0f };
-				newOrigin[0] = std::stof(params.get(2));
-				newOrigin[1] = std::stof(params.get(3));
-				newOrigin[2] = std::stof(params.get(4));
-
-				game::TeleportPlayer(ent, newOrigin, neutralViewAngle);
-			});
-
 			command::add("force_last_stand", [](const command::params& params)
 			{
 				if (params.size() < 2) return;
@@ -270,7 +216,7 @@ namespace movement
 			{
 				if (params.size() < 2) return;
 
-				const auto g_client = game::g_entities[std::atoi(params.get(1))].client;
+				auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
 
 				if (g_client == nullptr) return;
 
@@ -283,17 +229,17 @@ namespace movement
 		{
 			player_lastStandCrawlSpeedScale = game::Dvar_FindVar("player_lastStandCrawlSpeedScale");
 			player_duckedSpeedScale = game::Dvar_RegisterFloat("player_duckedSpeedScale", 0.65f, 0.0f, 5.0f,
-				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
+				game::CHEAT | game::CODINFO,
 				"The scale applied to the player speed when ducking");
 			player_proneSpeedScale = game::Dvar_RegisterFloat("player_proneSpeedScale", 0.15f, 0.0f, 5.0f,
-				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
+				game::CHEAT | game::CODINFO,
 				"The scale applied to the player speed when crawling");
 			player_activate_slowdown = game::Dvar_RegisterBool("player_activate_slowdown", true,
-				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
+				game::CHEAT | game::CODINFO,
 				"Slow the player down");
-			sv_enableElevators = game::Dvar_RegisterBool("sv_enableElevators", false,
-				game::DVAR_FLAG_CHEAT | game::DVAR_FLAG_REPLICATED,
-				"sv_enableElevators");
+			bg_elevators = game::Dvar_RegisterBool("bg_elevators", false,
+				game::CHEAT | game::CODINFO,
+				"Elevator glitch settings");
 		}
 	};
 }

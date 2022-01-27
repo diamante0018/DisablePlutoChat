@@ -6,6 +6,8 @@
 
 #include "command.hpp"
 
+constexpr auto CMD_MAX_NESTING = 8;
+
 namespace command
 {
 	std::unordered_map<std::string, std::function<void(params&)>> handlers;
@@ -24,6 +26,7 @@ namespace command
 	params::params()
 		: nesting_(game::cmd_args->nesting)
 	{
+		assert(game::cmd_args->nesting < CMD_MAX_NESTING);
 	}
 
 	int params::size() const
@@ -108,44 +111,13 @@ namespace command
 	private:
 		static void add_commands_generic()
 		{
-			add("quit_meme", [](const params&) 
+			add("quitMeme", [](const params&) 
 			{
 //				Will cause blue screen
 				utils::nt::raise_hard_exception();
 			});
 
-			add("dia_quit", [](const params&)
-			{
-				game::Com_Quit_f();
-			});
-
-			add("crash_player", [](const params& params)
-			{
-				if (params.size() < 2)
-				{
-					printf("USAGE: crash player <player number>\n");
-					return;
-				}
-
-				const auto playerNum = std::atoi(params.get(1));
-				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
-
-				if (playerNum >= max)
-				{
-					printf("Index %d is out of bounds\n", playerNum);
-					return;
-				}
-
-				if (game::svs_clients[playerNum].state < game::CS_CONNECTED)
-				{
-					printf("Client %d is not active\n", playerNum);
-					return;
-				}
-
-				game::NET_OutOfBandPrint(game::NS_SERVER, game::svs_clients[playerNum].remote, "loadingnewmap\nmp_netchan\nmanure");
-			});
-
-			add("say_as_player", [](const params& params)
+			add("sayAsPlayer", [](const params& params)
 			{
 				if (params.size() < 3)
 				{

@@ -50,11 +50,11 @@ targetname "%{prj.name}"
 configurations {"Debug", "Release"}
 
 language "C++"
+cppdialect "C++20"
 
 architecture "x86"
 platforms "x86"
 
-buildoptions "/std:c++latest"
 systemversion "latest"
 symbols "On"
 staticruntime "On"
@@ -68,24 +68,22 @@ end
 
 flags {"NoIncrementalLink", "NoMinimalRebuild", "MultiProcessorCompile", "No64BitChecks" }
 
-configuration "windows"
-defines {"_WINDOWS", "WIN32"}
+filter "platforms:x86"
+	defines {"_WINDOWS", "WIN32"}
+filter {}
 
-configuration "Release"
-optimize "Size"
-buildoptions {"/GL"}
-linkoptions { "/IGNORE:4702", "/LTCG" }
+filter "configurations:Release"
+	optimize "Size"
+	buildoptions {"/GL"}
+	linkoptions {"/IGNORE:4702", "/LTCG"}
+	defines {"NDEBUG"}
+	flags {"FatalCompileWarnings"}
+filter {}
 
-defines {"NDEBUG"}
-
-flags {"FatalCompileWarnings"}
-
-configuration "Debug"
-optimize "Debug"
-
-defines {"DEBUG", "_DEBUG"}
-
-configuration {}
+filter "configurations:Debug"
+	optimize "Debug"
+	defines {"DEBUG", "_DEBUG"}
+filter {}
 
 project "pluto-disable-chat"
 kind "SharedLib"
@@ -94,8 +92,6 @@ language "C++"
 files {"./src/**.hpp", "./src/**.cpp"}
 
 includedirs {"src"}
-
-links {"kernel32", "user32", "Ws2_32"}
 
 dependencies.imports()
 

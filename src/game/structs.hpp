@@ -7,6 +7,18 @@ namespace game
 	typedef vec_t vec3_t[3];
 	typedef vec_t vec4_t[4];
 
+	typedef enum
+	{
+		ERR_FATAL = 0x0,
+		ERR_DROP = 0x1,
+		ERR_SERVERDISCONNECT = 0x2,
+		ERR_DISCONNECT = 0x3,
+		ERR_SCRIPT = 0x4,
+		ERR_SCRIPT_DROP = 0x5,
+		ERR_LOCALIZATION = 0x6,
+		ERR_MAPLOADERRORSUMMARY = 0x7
+	} errorParm_t;
+
 	struct StringTableCell
 	{
 		const char* string;
@@ -58,7 +70,9 @@ namespace game
 		NA_BAD = 0x1,
 		NA_LOOPBACK = 0x2,
 		NA_BROADCAST = 0x3,
-		NA_IP = 0x4
+		NA_IP = 0x4,
+		NA_IPX = 0x5,
+		NA_BROADCAST_IPX = 0x6
 	};
 
 	struct netadr_s
@@ -66,9 +80,8 @@ namespace game
 		netadrtype_t type;
 		unsigned char ip[4];
 		unsigned __int16 port;
-		netsrc_t localNetID;
-		char __pad0[4];
-		unsigned int index;
+		unsigned char ipx[10];
+		unsigned int addrHandleIndex;
 	};
 
 	static_assert(sizeof(netadr_s) == 24);
@@ -328,16 +341,21 @@ namespace game
 
 	enum dvar_flags : std::uint16_t
 	{
-		DVAR_FLAG_NONE = 0,
-		DVAR_FLAG_SAVED = 1,
-		DVAR_FLAG_LATCHED = 2,
-		DVAR_FLAG_CHEAT = 4,
-		DVAR_FLAG_REPLICATED = 0x8,
-		DVAR_FLAG_UNK1 = 0x40,
-		DVAR_FLAG_UNK2 = 0x200,
-		DVAR_FLAG_SYSTEM = 0x400,
-		DVAR_FLAG_WRITE = 0x800,
-		DVAR_FLAG_READONLY = 0x2000,
+		NONE = 0,
+		ARCHIVE = 1,
+		LATCHED = 2,
+		CHEAT = 4,
+		CODINFO = 0x8,
+		SCRIPTINFO = 0x10,
+		CHANGEABLE_RESET = 0x40,
+		EXTERNAL = 0x100,
+		USERINFO = 0x200,
+		SERVERINFO = 0x400,
+		WRITEPROTECTED = 0x800,
+		SYSTEMINFO = 0x1000,
+		READONLY = 0x2000,
+		SAVED = 0x4000,
+		AUTOEXEC = 0x8000
 	};
 
 	union DvarValue
@@ -677,8 +695,8 @@ namespace game
 
 	struct Bounds
 	{
-		float midPoint[3];
-		float halfSize[3];
+		vec3_t midPoint;
+		vec3_t halfSize;
 	};
 
 	static_assert(sizeof(Bounds) == 24);
@@ -828,16 +846,15 @@ namespace game
 
 	static_assert(sizeof(TraceExtents) == 96);
 
-#pragma pack(push, 1)
 	struct trace_t
 	{
 		float fraction;
 		float normal[3];
 		int surfaceFlags;
 		int contents;
+		const char* material;
 		TraceHitType hitType;
 		unsigned __int16 hitId;
-		float fractionForHitType;
 		unsigned __int16 modelIndex;
 		unsigned __int16 partName;
 		unsigned __int16 partGroup;
@@ -845,7 +862,6 @@ namespace game
 		bool startsolid;
 		bool walkable;
 	};
-#pragma pack(pop)
 
 	struct BulletTraceResults
 	{
@@ -872,5 +888,124 @@ namespace game
 		float previous_origin[3];
 		float previous_velocity[3];
 		int holdrand;
+	};
+
+	enum MaterialTechniqueType
+	{
+		TECHNIQUE_DEPTH_PREPASS = 0,
+		TECHNIQUE_BUILD_FLOAT_Z = 1,
+		TECHNIQUE_BUILD_SHADOWMAP_DEPTH = 2,
+		TECHNIQUE_BUILD_SHADOWMAP_COLOR = 3,
+		TECHNIQUE_UNLIT = 4,
+		TECHNIQUE_EMISSIVE = 5,
+		TECHNIQUE_EMISSIVE_DFOG = 6,
+		TECHNIQUE_EMISSIVE_SHADOW = 7,
+		TECHNIQUE_EMISSIVE_SHADOW_DFOG = 8,
+		TECHNIQUE_LIT_BEGIN = 9,
+		TECHNIQUE_LIT = 9,
+		TECHNIQUE_LIT_DFOG = 10,
+		TECHNIQUE_LIT_SUN = 11,
+		TECHNIQUE_LIT_SUN_DFOG = 12,
+		TECHNIQUE_LIT_SUN_SHADOW = 13,
+		TECHNIQUE_LIT_SUN_SHADOW_DFOG = 14,
+		TECHNIQUE_LIT_SPOT = 15,
+		TECHNIQUE_LIT_SPOT_DFOG = 16,
+		TECHNIQUE_LIT_SPOT_SHADOW = 17,
+		TECHNIQUE_LIT_SPOT_SHADOW_DFOG = 18,
+		TECHNIQUE_LIT_SPOT_SHADOW_CUCOLORIS = 19,
+		TECHNIQUE_LIT_SPOT_SHADOW_CUCOLORIS_DFOG = 20,
+		TECHNIQUE_LIT_OMNI = 21,
+		TECHNIQUE_LIT_OMNI_DFOG = 22,
+		TECHNIQUE_LIT_OMNI_SHADOW = 23,
+		TECHNIQUE_LIT_OMNI_SHADOW_DFOG = 24,
+		TECHNIQUE_LIT_END = 25,
+		TECHNIQUE_LIGHT_SPOT = 25,
+		TECHNIQUE_LIGHT_OMNI = 26,
+		TECHNIQUE_LIGHT_SPOT_SHADOW = 27,
+		TECHNIQUE_LIGHT_SPOT_SHADOW_CUCOLORIS = 28,
+		TECHNIQUE_FAKELIGHT_NORMAL = 29,
+		TECHNIQUE_FAKELIGHT_VIEW = 30,
+		TECHNIQUE_SUNLIGHT_PREVIEW = 31,
+		TECHNIQUE_CASE_TEXTURE = 32,
+		TECHNIQUE_WIREFRAME_SOLID = 33,
+		TECHNIQUE_WIREFRAME_SHADED = 34,
+		TECHNIQUE_THERMAL = 35,
+		TECHNIQUE_DEBUG_BUMPMAP = 36,
+		TECHNIQUE_COUNT = 37,
+		TECHNIQUE_TOTAL_COUNT = 38,
+		TECHNIQUE_NONE = 39
+	};
+
+	struct MaterialArgumentCodeConst
+	{
+		unsigned __int16 index;
+		unsigned char firstRow;
+		unsigned char rowCount;
+	};
+
+	static_assert(sizeof(MaterialArgumentCodeConst) == 4);
+
+	union MaterialArgumentDef
+	{
+		float* literalConst;
+		MaterialArgumentCodeConst codeConst;
+		unsigned int codeSampler;
+		unsigned int nameHash;
+	};
+
+	struct MaterialShaderArgument
+	{
+		unsigned __int16 type;
+		unsigned __int16 dest;
+		MaterialArgumentDef u;
+	};
+
+	struct MaterialPass
+	{
+		char __pad0[108];
+	};
+
+	struct MaterialTechnique
+	{
+		const char* name;
+		unsigned __int16 flags;
+		unsigned __int16 passCount;
+		MaterialPass passArray;
+	};
+
+	struct MaterialInfo
+	{
+		const char* name;
+		unsigned int gameFlags;
+	};
+
+	struct Material
+	{
+		MaterialInfo info;
+	};
+
+	struct GfxCmdBufSourceState
+	{
+	};
+
+	struct GfxCmdBufState
+	{
+		unsigned char refSamplerState[16]; // 0
+		unsigned int samplerState[16]; // 16
+		void* samplerTexture[16]; // 80
+		char prim[44]; // 144
+		Material* material; // 188
+		MaterialTechniqueType techType; // 192
+		MaterialTechnique* technique; // 196
+		MaterialPass* pass; // 200
+		unsigned int passIndex; // 204
+	};
+
+	static_assert(offsetof(GfxCmdBufState, passIndex) == 204);
+
+	struct GfxCmdBufContext
+	{
+		GfxCmdBufSourceState* source;
+		GfxCmdBufState* state;
 	};
 }

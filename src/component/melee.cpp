@@ -19,7 +19,7 @@ namespace melee
     public:
         void post_unpack() override
         {
-            g_allowMelee = game::Dvar_RegisterBool("g_allowMelee", true, game::DVAR_FLAG_NONE, "Allows the usage of the knife");
+            g_allowMelee = game::Dvar_RegisterBool("g_allowMelee", true, game::NONE, "Allow the usage of the knife");
             utils::hook::call(0x04F7AB9, fire_melee_stub);
         }
     };
