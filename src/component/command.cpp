@@ -121,59 +121,21 @@ namespace command
 			{
 				if (params.size() < 3)
 				{
-					printf("USAGE: say as player <player number> <message>\n");
 					return;
 				}
 
 				const auto playerNum = std::atoi(params.get(1));
-				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-				if (playerNum >= max)
+				if (playerNum >= *game::svs_clientCount)
 				{
-					printf("Client number %d is out of bounds\n", playerNum);
 					return;
 				}
 
-				if (game::svs_clients[playerNum].state < game::CS_CONNECTED)
-				{
-					printf("Client %d is not active\n", playerNum);
-					return;
-				}
-
-				const auto message = params.join(2);
 				const auto player = &game::g_entities[playerNum];
 
 				if (player->client == nullptr) return;
 
-				game::Cmd_Say_f(player, 0, 0, message.data());
-			});
-
-			add("troll_player", [](const params& params)
-			{
-				if (params.size() < 2)
-				{
-					printf("USAGE: troll player <player number>\n");
-					return;
-				}
-
-				const auto playerNum = std::atoi(params.get(1));
-				const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
-
-				if (playerNum >= max)
-				{
-					printf("Index %d is out of bounds\n", playerNum);
-					return;
-				}
-
-				if (game::svs_clients[playerNum].state < game::CS_CONNECTED)
-				{
-					printf("Client %d is not active\n", playerNum);
-					return;
-				}
-
-				game::SV_GameSendServerCommand(playerNum, 0, "s 0");
-				game::SV_GameSendServerCommand(playerNum, 0, "u _ 0 1337");
-				game::SV_GameSendServerCommand(playerNum, 0, "c \"^1Hello there!\"");
+				game::Cmd_Say_f(player, 0, 0, params.join(2).data());
 			});
 		}
 	};

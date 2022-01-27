@@ -54,6 +54,31 @@ namespace game
 
 	typedef enum
 	{
+		HITLOC_NONE,
+		HITLOC_HELMET,
+		HITLOC_HEAD,
+		HITLOC_NECK,
+		HITLOC_TORSO_UPR,
+		HITLOC_TORSO_LWR,
+		HITLOC_R_ARM_UPR,
+		HITLOC_L_ARM_UPR,
+		HITLOC_R_ARM_LWR,
+		HITLOC_L_ARM_LWR,
+		HITLOC_R_HAND,
+		HITLOC_L_HAND,
+		HITLOC_R_LEG_UPR,
+		HITLOC_L_LEG_UPR,
+		HITLOC_R_LEG_LWR,
+		HITLOC_L_LEG_LWR,
+		HITLOC_R_FOOT,
+		HITLOC_L_FOOT,
+		HITLOC_GUN,
+		HITLOC_SHIELD,
+		HITLOC_NUM
+	} hitLocation_t;
+
+	typedef enum
+	{
 		NS_CLIENT1 = 0,
 		NS_CLIENT2 = 1,
 		NS_CLIENT3 = 2,
@@ -728,11 +753,52 @@ namespace game
 
 	static_assert(sizeof(playerState_s) == 13056);
 
+	enum entityFlag
+	{
+		FL_GODMODE = 0x1,
+		FL_DEMI_GODMODE = 0x2,
+		FL_NOTARGET = 0x4,
+		FL_NO_KNOCKBACK = 0x8,
+		FL_NO_RADIUS_DAMAGE = 0x10,
+		FL_SUPPORTS_LINKTO = 0x1000,
+		FL_NO_AUTO_ANIM_UPDATE = 0x2000,
+		FL_GRENADE_TOUCH_DAMAGE = 0x4000,
+		FL_STABLE_MISSILES = 0x20000,
+		FL_REPEAT_ANIM_UPDATE = 0x40000,
+		FL_VEHICLE_TARGET = 0x80000,
+		FL_GROUND_ENT = 0x100000,
+		FL_CURSOR_HINT = 0x200000,
+		FL_MISSILE_ATTRACTOR = 0x800000,
+		FL_WEAPON_BEING_GRABBED = 0x1000000,
+		FL_DELETE = 0x2000000,
+		FL_BOUNCE = 0x4000000,
+		FL_MOVER_SLIDE = 0x8000000
+	};
+
+	typedef enum
+	{
+		SESS_STATE_PLAYING = 0x0,
+		SESS_STATE_DEAD = 0x1,
+		SESS_STATE_SPECTATOR = 0x2,
+		SESS_STATE_INTERMISSION = 0x3
+	} sessionState_t;
+
+	typedef enum
+	{
+		CON_DISCONNECTED = 0x0,
+		CON_CONNECTING = 0x1,
+		CON_CONNECTED = 0x2
+	} clientConnected_t;
+
 	struct gclient_s
 	{
 		playerState_s ps;
-		char __pad0[716];
-		int flags;
+		char __pad0[12];
+		sessionState_t sessionState; // 13068
+		char __pad1[40];
+		clientConnected_t connected; // 13112
+		char __pad2[656]; // 13056
+		int flags; // 13772
 		int spectatorClient;
 		int lastCmdTime;
 //		int mpviewer; // Debug ?
@@ -814,19 +880,31 @@ namespace game
 
 	static_assert(sizeof(client_s) == 0x78698);
 
+	struct EntHandle
+	{
+		unsigned __int16 number;
+		unsigned __int16 infoIndex;
+	};
+
 	struct gentity_s
 	{
 		int entnum;
-		char __pad0[0x154];
-		gclient_s* client;
-		char __pad1[0x28];
+		char __pad0[340];
+		gclient_s* client; // 344
+		char __pad1[40];
 		int flags;
-		char __pad2[0xEC];
+		int eventTime;
+		int clipmask;
+		int processedFrame;
+		EntHandle parent;
+		int nextthink;
+		int health;
+		char __pad2[212];
 	};
 
 #pragma pack(pop)
 
-	static_assert(sizeof(gentity_s) == 0x274);
+	static_assert(sizeof(gentity_s) == 628);
 
 	struct TraceExtents
 	{
@@ -863,6 +941,8 @@ namespace game
 		bool walkable;
 	};
 
+	static_assert(sizeof(trace_t) == 0x2C);
+
 	struct BulletTraceResults
 	{
 		trace_t trace;
@@ -888,124 +968,5 @@ namespace game
 		float previous_origin[3];
 		float previous_velocity[3];
 		int holdrand;
-	};
-
-	enum MaterialTechniqueType
-	{
-		TECHNIQUE_DEPTH_PREPASS = 0,
-		TECHNIQUE_BUILD_FLOAT_Z = 1,
-		TECHNIQUE_BUILD_SHADOWMAP_DEPTH = 2,
-		TECHNIQUE_BUILD_SHADOWMAP_COLOR = 3,
-		TECHNIQUE_UNLIT = 4,
-		TECHNIQUE_EMISSIVE = 5,
-		TECHNIQUE_EMISSIVE_DFOG = 6,
-		TECHNIQUE_EMISSIVE_SHADOW = 7,
-		TECHNIQUE_EMISSIVE_SHADOW_DFOG = 8,
-		TECHNIQUE_LIT_BEGIN = 9,
-		TECHNIQUE_LIT = 9,
-		TECHNIQUE_LIT_DFOG = 10,
-		TECHNIQUE_LIT_SUN = 11,
-		TECHNIQUE_LIT_SUN_DFOG = 12,
-		TECHNIQUE_LIT_SUN_SHADOW = 13,
-		TECHNIQUE_LIT_SUN_SHADOW_DFOG = 14,
-		TECHNIQUE_LIT_SPOT = 15,
-		TECHNIQUE_LIT_SPOT_DFOG = 16,
-		TECHNIQUE_LIT_SPOT_SHADOW = 17,
-		TECHNIQUE_LIT_SPOT_SHADOW_DFOG = 18,
-		TECHNIQUE_LIT_SPOT_SHADOW_CUCOLORIS = 19,
-		TECHNIQUE_LIT_SPOT_SHADOW_CUCOLORIS_DFOG = 20,
-		TECHNIQUE_LIT_OMNI = 21,
-		TECHNIQUE_LIT_OMNI_DFOG = 22,
-		TECHNIQUE_LIT_OMNI_SHADOW = 23,
-		TECHNIQUE_LIT_OMNI_SHADOW_DFOG = 24,
-		TECHNIQUE_LIT_END = 25,
-		TECHNIQUE_LIGHT_SPOT = 25,
-		TECHNIQUE_LIGHT_OMNI = 26,
-		TECHNIQUE_LIGHT_SPOT_SHADOW = 27,
-		TECHNIQUE_LIGHT_SPOT_SHADOW_CUCOLORIS = 28,
-		TECHNIQUE_FAKELIGHT_NORMAL = 29,
-		TECHNIQUE_FAKELIGHT_VIEW = 30,
-		TECHNIQUE_SUNLIGHT_PREVIEW = 31,
-		TECHNIQUE_CASE_TEXTURE = 32,
-		TECHNIQUE_WIREFRAME_SOLID = 33,
-		TECHNIQUE_WIREFRAME_SHADED = 34,
-		TECHNIQUE_THERMAL = 35,
-		TECHNIQUE_DEBUG_BUMPMAP = 36,
-		TECHNIQUE_COUNT = 37,
-		TECHNIQUE_TOTAL_COUNT = 38,
-		TECHNIQUE_NONE = 39
-	};
-
-	struct MaterialArgumentCodeConst
-	{
-		unsigned __int16 index;
-		unsigned char firstRow;
-		unsigned char rowCount;
-	};
-
-	static_assert(sizeof(MaterialArgumentCodeConst) == 4);
-
-	union MaterialArgumentDef
-	{
-		float* literalConst;
-		MaterialArgumentCodeConst codeConst;
-		unsigned int codeSampler;
-		unsigned int nameHash;
-	};
-
-	struct MaterialShaderArgument
-	{
-		unsigned __int16 type;
-		unsigned __int16 dest;
-		MaterialArgumentDef u;
-	};
-
-	struct MaterialPass
-	{
-		char __pad0[108];
-	};
-
-	struct MaterialTechnique
-	{
-		const char* name;
-		unsigned __int16 flags;
-		unsigned __int16 passCount;
-		MaterialPass passArray;
-	};
-
-	struct MaterialInfo
-	{
-		const char* name;
-		unsigned int gameFlags;
-	};
-
-	struct Material
-	{
-		MaterialInfo info;
-	};
-
-	struct GfxCmdBufSourceState
-	{
-	};
-
-	struct GfxCmdBufState
-	{
-		unsigned char refSamplerState[16]; // 0
-		unsigned int samplerState[16]; // 16
-		void* samplerTexture[16]; // 80
-		char prim[44]; // 144
-		Material* material; // 188
-		MaterialTechniqueType techType; // 192
-		MaterialTechnique* technique; // 196
-		MaterialPass* pass; // 200
-		unsigned int passIndex; // 204
-	};
-
-	static_assert(offsetof(GfxCmdBufState, passIndex) == 204);
-
-	struct GfxCmdBufContext
-	{
-		GfxCmdBufSourceState* source;
-		GfxCmdBufState* state;
 	};
 }

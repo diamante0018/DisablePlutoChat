@@ -55,7 +55,6 @@ namespace chat
             {
                 if (params.size() < 2)
                 {
-                    printf("USAGE: mute player <player number>\n");
                     return;
                 }
 
@@ -65,14 +64,12 @@ namespace chat
 
                 if (playerNum >= max)
                 {
-                    printf("Client number %d is out of bounds\n", playerNum);
                     return;
                 }
 
                 std::unique_lock<std::mutex> _(access_mutex);
                 if (mute_list.contains(playerNum))
                 {
-                    printf("Client number %d is already muted\n", playerNum);
                     return;
                 }
 
@@ -83,7 +80,6 @@ namespace chat
             {
                 if (params.size() < 2)
                 {
-                    printf("USAGE: unmute player <player number>\n");
                     return;
                 }
 
@@ -93,14 +89,12 @@ namespace chat
 
                 if (playerNum >= max)
                 {
-                    printf("Client number %d is out of bounds\n", playerNum);
                     return;
                 }
 
                 std::unique_lock<std::mutex> _(access_mutex);
                 if (!mute_list.contains(playerNum))
-                {
-                    printf("Client number %d is not muted\n", playerNum);
+                {              
                     return;
                 }
 

@@ -13,6 +13,11 @@ namespace game
 	WEAK symbol<int(void*)> BG_GetMaxSprintTime{0x041BA70};
 	WEAK symbol<void(gentity_s* ent, float* position, float* orientation)> TeleportPlayer{0x050D840};
 
+	WEAK symbol<void(pmove_t*, trace_t*, const float*,
+		const float*, const Bounds*, int, int)> PM_playerTrace{0x0421F00};
+	WEAK symbol<void(const pmove_t* move, trace_t* trace, const float*,
+		const float*, const Bounds*, int, int)> PM_trace{0x041CEB0};
+	WEAK symbol<EffectiveStance(const playerState_s*)> PM_GetEffectiveStance{0x041D1E0};
 	WEAK symbol<void(playerState_s*)> Jump_ClearState{0x04160F0};
 	WEAK symbol<void(playerState_s*)> PM_ExitAimDownSight{0x0428050};
 	WEAK symbol<EffectiveStance(const playerState_s*)> PM_GetEffectiveStance{0x041D1E0};
@@ -21,6 +26,8 @@ namespace game
 	WEAK symbol<void(unsigned int*)> BG_srand{0x04237A0};
 	WEAK symbol<bool(const unsigned int* const, Weapon, bool)> BG_WeaponBulletFire_ShouldPenetrate{0x0431250};
 	WEAK symbol<bool(const unsigned int* const, Weapon, bool)> BG_WeaponBulletFire_ShouldSpread{0x0438F00};
+	WEAK symbol<void(gentity_s*, const gentity_s*, gentity_s*,
+		int, int, Weapon, bool, const float*, hitLocation_t, int)> player_die{0x0503460};
 
 	WEAK symbol<void(errorParm_t, const char* fmt, ...)> Com_Error{0x0555450};
 	WEAK symbol<const char*(int index)> ConcatArgs{0x502150};
@@ -44,7 +51,6 @@ namespace game
 	WEAK symbol<dvar_t*(const char* dvarName, float value, float min, float max, unsigned short flags, const char* description)>
 		Dvar_RegisterFloat{0x05BEA80};
 	WEAK symbol<void(const char* name, const char* value)> Dvar_SetStringByName{0x05BF660};
-	WEAK symbol<void(dvar_t* var, DvarValue value, int force)> Dvar_SetVariant{0x05BD920};
 
 	WEAK symbol<const char*(const char* s, const char* key)> Info_ValueForKey{0x05C2DB0};
 	WEAK symbol<void(char* s, const char* key)> Info_RemoveKey{0x05C2F50};
