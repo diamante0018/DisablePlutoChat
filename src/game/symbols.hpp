@@ -20,7 +20,6 @@ namespace game
 	WEAK symbol<EffectiveStance(const playerState_s*)> PM_GetEffectiveStance{0x041D1E0};
 	WEAK symbol<void(playerState_s*)> Jump_ClearState{0x04160F0};
 	WEAK symbol<void(playerState_s*)> PM_ExitAimDownSight{0x0428050};
-	WEAK symbol<EffectiveStance(const playerState_s*)> PM_GetEffectiveStance{0x041D1E0};
 	WEAK symbol<void(unsigned int weapon, bool isAlternate, char* output, unsigned int maxStringLen)> BG_GetWeaponNameComplete{0x042F760};
 	WEAK symbol<weapType_t(Weapon, bool)> BG_GetWeaponType{0x0436E30};
 	WEAK symbol<void(unsigned int*)> BG_srand{0x04237A0};

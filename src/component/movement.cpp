@@ -13,8 +13,10 @@ namespace movement
 	game::dvar_t* player_activate_slowdown;
 	game::dvar_t* bg_elevators;
 
-	float pm_cmd_scale_for_stance(game::pmove_t* move)
+	float pm_cmd_scale_for_stance(const game::pmove_t* pm)
 	{
+		assert(pm->ps != nullptr);
+
 		float scale{};
 		const auto* playerState = pm->ps;
 
@@ -54,7 +56,7 @@ namespace movement
 		}
 
 		scale = 1.0f;
-		auto stance = pm_get_effective_stance(playerState);
+		const auto stance = game::PM_GetEffectiveStance(playerState);
 
 		if (stance == game::PM_EFF_STANCE_PRONE)
 		{
@@ -109,46 +111,20 @@ namespace movement
 	void pm_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* f3, const float* f4,
 		const game::Bounds* bounds, int a6, int a7)
 	{
-		__asm
-		{
-			push eax
-			mov eax, sv_enableElevators
-			cmp byte ptr [eax + 12], 1
-			pop eax
+		game::PM_trace(move, trace, f3, f4, bounds, a6, a7);
 
-		if (sv_enableElevators->current.enabled)
+		if (bg_elevators->current.enabled)
 		{
 			trace->allsolid = false;
 		}
 	}
 
-	__declspec(naked) void pm_jitter_point_stub_2()
+	void pm_player_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* f3,
+		const float* f4, const game::Bounds* bounds, int a6, int a7)
 	{
-		__asm
-		{
-			push eax
-			mov eax, sv_enableElevators
-			cmp byte ptr [eax + 12], 1
-			pop eax
+		game::PM_playerTrace(move, trace, f3, f4, bounds, a6, a7);
 
-			je jumpOver
-
-			cmp byte ptr [ebp + 0x29], 0
-			jz jumpOver
-
-			push 0x04228C3
-			retn
-
-		jumpOver:
-			push 0x04228E6
-			retn
-		}
-	}
-
-	void pm_trace_stub(game::pmove_t* move, game::trace_t* trace, const float* const f3, const float* const f4,
-		const game::Bounds* bounds, int a6, int a7)
-	{
-		if (!sv_enableElevators->current.enabled)
+		if (bg_elevators->current.enabled)
 		{
 			trace->startsolid = false;
 		}
@@ -182,20 +158,6 @@ namespace movement
 	private:
 		static void add_movement_commands()
 		{
-			command::add("teleport_player", [](const command::params& params)
-			{
-				if (params.size() < 5) return;
-
-				const auto ent = &game::g_entities[std::atoi(params.get(1))];
-				game::vec3_t newOrigin{};
-				game::vec3_t neutralViewAngle{ 0.0f, 0.0f, 0.0f };
-				newOrigin[0] = std::stof(params.get(2));
-				newOrigin[1] = std::stof(params.get(3));
-				newOrigin[2] = std::stof(params.get(4));
-
-				game::TeleportPlayer(ent, newOrigin, neutralViewAngle);
-			});
-
 			command::add("force_last_stand", [](const command::params& params)
 			{
 				if (params.size() < 2) return;
