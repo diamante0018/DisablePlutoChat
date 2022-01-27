@@ -60,9 +60,8 @@ namespace chat
 
                 const auto input = params.get(1);
                 const auto playerNum = std::atoi(input);
-                const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-                if (playerNum >= max)
+                if (playerNum >= *game::svs_clientCount)
                 {
                     return;
                 }
@@ -85,9 +84,8 @@ namespace chat
 
                 const auto input = params.get(1);
                 const auto playerNum = std::atoi(input);
-                const auto max = game::Dvar_FindVar("sv_maxclients")->current.integer;
 
-                if (playerNum >= max)
+                if (playerNum >= *game::svs_clientCount)
                 {
                     return;
                 }
