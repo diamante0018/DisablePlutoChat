@@ -93,6 +93,10 @@ files {"./src/**.hpp", "./src/**.cpp"}
 
 includedirs {"src"}
 
+if _OPTIONS["copy-to"] then
+	postbuildcommands {"copy /y \"$(TargetPath)\" \"" .. _OPTIONS["copy-to"] .. "\""}
+end
+
 dependencies.imports()
 
 group "Dependencies"

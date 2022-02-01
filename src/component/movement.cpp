@@ -11,6 +11,10 @@ namespace movement
 	game::dvar_t* player_duckedSpeedScale;
 	game::dvar_t* player_proneSpeedScale;
 	game::dvar_t* player_activate_slowdown;
+	game::dvar_t* player_spectateSpeedScale;
+	game::dvar_t* cg_ufoScaler;
+	game::dvar_t* cg_noclipScaler;
+	game::dvar_t* bg_bouncesAllAngles;
 	game::dvar_t* bg_elevators;
 
 	float pm_cmd_scale_for_stance(const game::pmove_t* pm)
@@ -95,6 +99,96 @@ namespace movement
 		}
 	}
 
+	float pm_move_scale(game::playerState_s* ps, float forwardmove,
+		float rightmove, float upmove)
+	{
+		assert(ps != nullptr);
+
+		auto max = (std::fabsf(forwardmove) < std::fabsf(rightmove))
+			? std::fabsf(rightmove)
+			: std::fabsf(forwardmove);
+
+		if (std::fabsf(upmove) > max)
+		{
+			max = std::fabsf(upmove);
+		}
+
+		if (max == 0.0f)
+		{
+			return 0.0f;
+		}
+
+		auto total = std::sqrtf(forwardmove * forwardmove
+			+ rightmove * rightmove + upmove * upmove);
+		auto scale = (ps->speed * max) / (127.0f * total);
+
+		if (ps->pm_flags & game::PMF_WALKING)
+		{
+			scale *= 0.4f;
+		}
+
+		if (ps->pm_type == game::PM_NOCLIP)
+		{
+			return scale * cg_noclipScaler->current.value;
+		}
+
+		if (ps->pm_type == game::PM_UFO)
+		{
+			return scale * cg_ufoScaler->current.value;
+		}
+
+		if (ps->pm_type == game::PM_SPECTATOR)
+		{
+			return scale * player_spectateSpeedScale->current.value;
+		}
+
+		return scale;
+	}
+
+	__declspec(naked) void pm_move_scale_stub()
+	{
+		__asm
+		{
+			pushad
+
+			push [esp + 0xC + 0x20]
+			push [esp + 0xC + 0x20]
+			push [esp + 0xC + 0x20]
+			push esi
+			call pm_move_scale
+			add esp, 0x10
+
+			popad
+			ret
+		}
+	}
+
+	void pm_project_velocity_stub(const float* velIn, const float* normal, float* velOut)
+	{
+		const auto lengthSquared2D = velIn[0] * velIn[0] + velIn[1] * velIn[1];
+
+		if (std::fabsf(normal[2]) < 0.001f || lengthSquared2D == 0.0)
+		{
+			velOut[0] = velIn[0];
+			velOut[1] = velIn[1];
+			velOut[2] = velIn[2];
+			return;
+		}
+
+		auto newZ = velIn[0] * normal[0] + velIn[1] * normal[1];
+		newZ = -newZ / normal[2];
+		const auto lengthScale = std::sqrtf((velIn[2] * velIn[2] + lengthSquared2D)
+			/ (newZ * newZ + lengthSquared2D));
+
+		if (bg_bouncesAllAngles->current.enabled
+			|| (lengthScale < 1.f || newZ < 0.f || velIn[2] > 0.f))
+		{
+			velOut[0] = velIn[0] * lengthScale;
+			velOut[1] = velIn[1] * lengthScale;
+			velOut[2] = newZ * lengthScale;
+		}
+	}
+
 	void jump_activate_slowdown_stub(game::playerState_s* ps)
 	{
 		if (player_activate_slowdown->current.enabled)
@@ -152,6 +246,11 @@ namespace movement
 			utils::hook::call(0x0422861, pm_player_trace_stub);
 			utils::hook::call(0x04228B5, pm_player_trace_stub);
 
+			utils::hook::call(0x041E210, pm_move_scale_stub);
+			utils::hook::call(0x041E48D, pm_move_scale_stub);
+
+			utils::hook::call(0x04227B2, pm_move_scale_stub);
+
 			add_movement_commands();
 		}
 
@@ -186,6 +285,8 @@ namespace movement
 		static void register_dvars()
 		{
 			player_lastStandCrawlSpeedScale = game::Dvar_FindVar("player_lastStandCrawlSpeedScale");
+			player_spectateSpeedScale = game::Dvar_FindVar("player_spectateSpeedScale");
+
 			player_duckedSpeedScale = game::Dvar_RegisterFloat("player_duckedSpeedScale", 0.65f, 0.0f, 5.0f,
 				game::CHEAT | game::CODINFO,
 				"The scale applied to the player speed when ducking");
@@ -195,9 +296,20 @@ namespace movement
 			player_activate_slowdown = game::Dvar_RegisterBool("player_activate_slowdown", true,
 				game::CHEAT | game::CODINFO,
 				"Slow the player down");
+
 			bg_elevators = game::Dvar_RegisterBool("bg_elevators", false,
 				game::CHEAT | game::CODINFO,
 				"Elevator glitch settings");
+			bg_bouncesAllAngles = game::Dvar_RegisterBool("bg_bouncesAllAngles", false,
+				game::CHEAT | game::CODINFO,
+				"Force bounce from all angles");
+
+			cg_noclipScaler = game::Dvar_RegisterFloat("cg_noclip_scaler", 3.0f, 0.001f, 1000.0f,
+				game::CHEAT | game::CODINFO,
+				"The speed at which noclip camera moves");
+			cg_ufoScaler = game::Dvar_RegisterFloat("cg_ufo_scaler", 6.0f, 0.001f, 1000.0f,
+				game::CHEAT | game::CODINFO,
+				"The speed at which ufo camera moves");
 		}
 	};
 }
