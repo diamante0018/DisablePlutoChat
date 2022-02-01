@@ -242,6 +242,8 @@ namespace movement
 			utils::hook::set<BYTE>(0x04F9F39, 0x75); // ClientEndFrame
 
 			utils::hook::call(0x041F995, pm_trace_stub);
+			utils::hook::call(0x041F8F8, pm_trace_stub);
+			utils::hook::call(0x041F941, pm_trace_stub);
 
 			utils::hook::call(0x0422861, pm_player_trace_stub);
 			utils::hook::call(0x04228B5, pm_player_trace_stub);
