@@ -278,8 +278,7 @@ namespace movement
 
 				if (g_client == nullptr) return;
 
-				auto playerState = &g_client->ps;
-				playerState->perks[0] ^= 0x4000u;
+				g_client->ps.perks[0] ^= 0x4000u;
 			});
 		}
 
