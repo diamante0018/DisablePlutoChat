@@ -10,7 +10,7 @@ namespace melee
     {
         if (g_allowMelee->current.enabled)
         {
-            reinterpret_cast<void (*)(game::gentity_s*, int)>(0x0530DB0)(ent, a2);
+            reinterpret_cast<void (*)(game::gentity_s*, int)>(0x530DB0)(ent, a2);
         }
     }
 
@@ -20,7 +20,7 @@ namespace melee
         void post_unpack() override
         {
             g_allowMelee = game::Dvar_RegisterBool("g_allowMelee", true, game::NONE, "Allow the usage of the knife");
-            utils::hook::call(0x04F7AB9, fire_melee_stub);
+            utils::hook::call(0x4F7AB9, fire_melee_stub);
         }
     };
 }

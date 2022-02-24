@@ -180,10 +180,10 @@ namespace dvars
 	public:
 		void post_unpack() override
 		{
-			dvar_register_bool_hook.create(0x05BE9F0, &dvar_register_bool);
-			dvar_register_float_hook.create(0x05BEA80, &dvar_register_float);
-			dvar_register_int_hook.create(0x05BEA40, &dvar_register_int);
-			dvar_register_string_hook.create(0x05BEC90, &dvar_register_string);
+			dvar_register_bool_hook.create(0x5BE9F0, &dvar_register_bool);
+			dvar_register_float_hook.create(0x5BEA80, &dvar_register_float);
+			dvar_register_int_hook.create(0x5BEA40, &dvar_register_int);
+			dvar_register_string_hook.create(0x5BEC90, &dvar_register_string);
 		}
 
 		void pre_destroy() override

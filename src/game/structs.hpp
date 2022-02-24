@@ -115,15 +115,18 @@ namespace game
 	{
 		int overflowed;
 		int readOnly;
-		char* data;
-		char* splitData;
+		unsigned char* data;
+		unsigned char* splitData;
 		int maxsize;
 		int cursize;
 		int splitSize;
 		int readcount;
 		int bit;
 		int lastEntityRef;
+		netsrc_t targetLocalNetID;
 	};
+
+	static_assert(sizeof(msg_t) == 44); // Size confirmed in CL_WritePacket
 
 	struct XZoneInfo
 	{
@@ -451,6 +454,8 @@ namespace game
 		char remoteControlAngles[2];
 		int remoteControlMove;
 	};
+
+	static_assert(sizeof(usercmd_s) == 44);
 
 	typedef enum
 	{

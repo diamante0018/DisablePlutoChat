@@ -23,8 +23,8 @@ namespace bullets
 	public:
 		void post_unpack() override
 		{
-			bullet_should_penetrate_hook.create(0x0431250, &bullet_should_penetrate_stub);
-			bullet_should_spread_hook.create(0x0438F00, &bullet_should_spread_stub);
+			bullet_should_penetrate_hook.create(0x431250, &bullet_should_penetrate_stub);
+			bullet_should_spread_hook.create(0x438F00, &bullet_should_spread_stub);
 		}
 
 		void pre_destroy() override

@@ -34,7 +34,7 @@ namespace chat
             }
         }
 
-        reinterpret_cast<void (*)(int)>(0x0502CB0)(clientNum);
+        reinterpret_cast<void (*)(int)>(0x502CB0)(clientNum);
     }
 
     class component final : public component_interface
@@ -42,7 +42,7 @@ namespace chat
     public:
         void post_unpack() override
         {
-            utils::hook::call(0x057192A, client_command_stub);
+            utils::hook::call(0x57192A, client_command_stub);
             add_chat_commands();
 
             sv_enableGameChat = game::Dvar_RegisterBool("sv_enableGameChat", true, game::SERVERINFO, "Enable game chat");
