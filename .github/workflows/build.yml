@@ -51,5 +51,5 @@ jobs:
         with:
           name: ${{matrix.configuration}} binaries
           path: |
-            build/bin/x86/${{matrix.configuration}}/pluto-disable-chat.exe
+            build/bin/x86/${{matrix.configuration}}/pluto-disable-chat.dll
             build/bin/x86/${{matrix.configuration}}/pluto-disable-chat.pdb
