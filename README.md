@@ -1,3 +1,5 @@
+[![build](https://github.com/XLabsProject/iw4x-client/workflows/Build/badge.svg)](https://github.com/diamante0018/DisablePlutoChat/actions)
+
 # DisablePlutoChat
 Disables game chat for good. This project expanded over the last few months and many more features were added.
 Some made it in the Plutonium Client!
