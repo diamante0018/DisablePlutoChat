@@ -5,24 +5,25 @@
 
 namespace melee
 {
-    game::dvar_t* g_allowMelee;
-    void fire_melee_stub(game::gentity_s* ent, int a2)
+  game::dvar_t* g_allowMelee;
+  void fire_melee_stub(game::gentity_s* ent, int a2)
+  {
+    if (g_allowMelee->current.enabled)
     {
-        if (g_allowMelee->current.enabled)
-        {
-            reinterpret_cast<void (*)(game::gentity_s*, int)>(0x530DB0)(ent, a2);
-        }
+      reinterpret_cast<void (*)(game::gentity_s*, int)>(0x530DB0)(ent, a2);
     }
+  }
 
-    class component final : public component_interface
+  class component final : public component_interface
+  {
+   public:
+    void post_unpack() override
     {
-    public:
-        void post_unpack() override
-        {
-            g_allowMelee = game::Dvar_RegisterBool("g_allowMelee", true, game::NONE, "Allow the usage of the knife");
-            utils::hook::call(0x4F7AB9, fire_melee_stub);
-        }
-    };
-}
+      g_allowMelee = game::Dvar_RegisterBool(
+          "g_allowMelee", true, game::NONE, "Allow the usage of the knife");
+      utils::hook::call(0x4F7AB9, fire_melee_stub);
+    }
+  };
+} // namespace melee
 
 REGISTER_COMPONENT(melee::component)

@@ -6,18 +6,17 @@
 
 #include <windows.h>
 
-#include <vector>
+#include <algorithm>
 #include <cassert>
+#include <functional>
+#include <iostream>
+#include <map>
 #include <mutex>
 #include <string>
-#include <iostream>
-#include <algorithm>
-#include <functional>
 #include <unordered_set>
-#include <map>
 #include <vector>
 
 using namespace std::literals;
 
-#include "game/structs.hpp"
 #include "game/game.hpp"
+#include "game/structs.hpp"

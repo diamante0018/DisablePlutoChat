@@ -2,27 +2,29 @@
 
 namespace command
 {
-	class params
-	{
-	public:
-		params();
+  class params
+  {
+   public:
+    params();
 
-		int size() const;
-		const char* get(int index) const;
-		std::string join(int index) const;
+    int size() const;
+    const char* get(int index) const;
+    std::string join(int index) const;
 
-		const char* operator[](const int index) const
-		{
-			return this->get(index);
-		}
+    const char* operator[](const int index) const
+    {
+      return this->get(index);
+    }
 
-	private:
-		int nesting_;
-	};
+   private:
+    int nesting_;
+  };
 
-	void add_raw(const char* name, void (*callback)());
-	void add(const char* name, const std::function<void(const params&)>& callback);
+  void add_raw(const char* name, void (*callback)());
+  void add(const char* name,
+           const std::function<void(const params&)>& callback);
 
-	void add_script_command(const std::string& name, const std::function<void(const params&)>& callback);
-	void clear_script_commands();
-}
+  void add_script_command(const std::string& name,
+                          const std::function<void(const params&)>& callback);
+  void clear_script_commands();
+} // namespace command
