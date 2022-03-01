@@ -18,5 +18,7 @@
 
 using namespace std::literals;
 
-#include "game/game.hpp"
+// clang-format off
 #include "game/structs.hpp"
+#include "game/game.hpp"
+// clang-format on

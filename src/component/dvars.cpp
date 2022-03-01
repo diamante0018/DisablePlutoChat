@@ -4,7 +4,6 @@
 #include "loader/component_loader.hpp"
 
 #include "dvars.hpp"
-#include "game/game.hpp"
 
 namespace dvars
 {
