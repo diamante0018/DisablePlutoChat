@@ -26,14 +26,16 @@ namespace scheduler
      public:
       void add(task&& task)
       {
-        new_callbacks_.access([&task, this](task_list& tasks) {
+        new_callbacks_.access([&task, this](task_list& tasks)
+        {
           tasks.emplace_back(std::move(task));
         });
       }
 
       void clear()
       {
-        callbacks_.access([&](task_list& tasks) {
+        callbacks_.access([&](task_list& tasks)
+        {
           this->merge_callbacks();
           tasks.clear();
         });
@@ -41,7 +43,8 @@ namespace scheduler
 
       void execute()
       {
-        callbacks_.access([&](task_list& tasks) {
+        callbacks_.access([&](task_list& tasks)
+        {
           this->merge_callbacks();
 
           for (auto i = tasks.begin(); i != tasks.end();)
@@ -76,8 +79,10 @@ namespace scheduler
 
       void merge_callbacks()
       {
-        callbacks_.access([&](task_list& tasks) {
-          new_callbacks_.access([&](task_list& new_tasks) {
+        callbacks_.access([&](task_list& tasks)
+        {
+          new_callbacks_.access([&](task_list& new_tasks)
+          {
             tasks.insert(
                 tasks.end(),
                 std::move_iterator<task_list::iterator>(new_tasks.begin()),
@@ -126,7 +131,8 @@ namespace scheduler
             const std::chrono::milliseconds delay)
   {
     schedule(
-        [callback]() {
+        [callback]()
+        {
           callback();
           return cond_continue;
         },
@@ -138,7 +144,8 @@ namespace scheduler
             const std::chrono::milliseconds delay)
   {
     schedule(
-        [callback]() {
+        [callback]()
+        {
           callback();
           return cond_end;
         },
@@ -153,7 +160,8 @@ namespace scheduler
    public:
     void post_unpack() override
     {
-      thread = std::thread([]() {
+      thread = std::thread([]()
+      {
         while (true)
         {
           execute(pipeline::async);

@@ -10,7 +10,31 @@ constexpr auto CMD_MAX_NESTING = 8;
 
 namespace command
 {
-  std::unordered_map<std::string, std::function<void(params&)>> handlers;
+  namespace
+  {
+    std::unordered_map<std::string, std::function<void(params&)>> handlers;
+
+    void cmd_say_as_player_f(const params& params)
+    {
+      if (params.size() < 3)
+      {
+        return;
+      }
+
+      const auto playerNum = std::atoi(params.get(1));
+
+      if (playerNum >= *game::svs_clientCount)
+      {
+        return;
+      }
+
+      const auto player = &game::g_entities[playerNum];
+
+      if (player->client == nullptr) return;
+
+      game::Cmd_Say_f(player, 0, 0, params.join(2).data());
+    }
+  } // namespace
 
   void main_handler()
   {
@@ -76,6 +100,13 @@ namespace command
     handlers[command] = callback;
   }
 
+  void add(const char* name, const std::function<void()>& callback)
+  {
+    add(name, [callback](const command::params&) {
+      callback();
+    });
+  }
+
   std::vector<std::string> script_commands;
   utils::memory::allocator allocator;
 
@@ -115,30 +146,8 @@ namespace command
    private:
     static void add_commands_generic()
     {
-      add("quitMeme", [](const params&) {
-        // Will cause blue screen
-        utils::nt::raise_hard_exception();
-      });
-
-      add("sayAsPlayer", [](const params& params) {
-        if (params.size() < 3)
-        {
-          return;
-        }
-
-        const auto playerNum = std::atoi(params.get(1));
-
-        if (playerNum >= *game::svs_clientCount)
-        {
-          return;
-        }
-
-        const auto player = &game::g_entities[playerNum];
-
-        if (player->client == nullptr) return;
-
-        game::Cmd_Say_f(player, 0, 0, params.join(2).data());
-      });
+      add("quitMeme", utils::nt::raise_hard_exception);
+      add("sayAsPlayer", cmd_say_as_player_f);
     }
   };
 } // namespace command

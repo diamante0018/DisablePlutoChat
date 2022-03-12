@@ -234,6 +234,29 @@ namespace movement
     }
   }
 
+  void cmd_marathon_perk_f(const command::params& params)
+  {
+    if (params.size() < 2) return;
+
+    auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
+
+    if (g_client == nullptr) return;
+
+    g_client->ps.perks[0] ^= 0x4000u;
+  }
+
+  void cmd_force_last_stand_f(const command::params& params)
+  {
+    if (params.size() < 2) return;
+
+    auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
+
+    if (g_client == nullptr) return;
+
+    g_client->lastStand = 1;
+    g_client->lastStandTime = 0;
+  }
+
   class component final : public component_interface
   {
    public:
@@ -268,26 +291,8 @@ namespace movement
    private:
     static void add_movement_commands()
     {
-      command::add("forceLastStand", [](const command::params& params) {
-        if (params.size() < 2) return;
-
-        auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
-
-        if (g_client == nullptr) return;
-
-        g_client->lastStand = 1;
-        g_client->lastStandTime = 0;
-      });
-
-      command::add("marathonPerk", [](const command::params& params) {
-        if (params.size() < 2) return;
-
-        auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
-
-        if (g_client == nullptr) return;
-
-        g_client->ps.perks[0] ^= 0x4000u;
-      });
+      command::add("forceLastStand", cmd_force_last_stand_f);
+      command::add("marathonPerk", cmd_marathon_perk_f);
     }
 
     static void register_dvars()
