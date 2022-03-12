@@ -102,7 +102,8 @@ namespace command
 
   void add(const char* name, const std::function<void()>& callback)
   {
-    add(name, [callback](const command::params&) {
+    add(name, [callback](const command::params&)
+    {
       callback();
     });
   }
