@@ -124,7 +124,9 @@ std::vector<std::unique_ptr<component_interface>>&
       std::unique_ptr<component_vector, std::function<void(component_vector*)>>;
 
   static component_vector_container components(
-      new component_vector, [](component_vector* component_vector) {
+      new component_vector,
+      [](component_vector* component_vector)
+      {
         pre_destroy();
         delete component_vector;
       });

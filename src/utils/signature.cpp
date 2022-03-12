@@ -177,16 +177,18 @@ namespace utils::hook
       const auto length = (i + 1 == cores)
                               ? (this->start_ + this->length_ - sub) - start
                               : grid;
-      threads.emplace_back([&, start, length]() {
-        auto local_result = this->process_range(start, length);
-        if (local_result.empty()) return;
+      threads.emplace_back(
+          [&, start, length]()
+          {
+            auto local_result = this->process_range(start, length);
+            if (local_result.empty()) return;
 
-        std::lock_guard _(mutex);
-        for (const auto& address : local_result)
-        {
-          result.push_back(address);
-        }
-      });
+            std::lock_guard _(mutex);
+            for (const auto& address : local_result)
+            {
+              result.push_back(address);
+            }
+          });
     }
 
     for (auto& t : threads)
