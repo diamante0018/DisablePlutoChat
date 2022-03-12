@@ -102,10 +102,11 @@ namespace command
 
   void add(const char* name, const std::function<void()>& callback)
   {
-    add(name, [callback](const command::params&)
-    {
-      callback();
-    });
+    add(name,
+        [callback](const command::params&)
+        {
+          callback();
+        });
   }
 
   std::vector<std::string> script_commands;

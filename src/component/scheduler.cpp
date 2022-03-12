@@ -26,51 +26,54 @@ namespace scheduler
      public:
       void add(task&& task)
       {
-        new_callbacks_.access([&task, this](task_list& tasks)
-        {
-          tasks.emplace_back(std::move(task));
-        });
+        new_callbacks_.access(
+            [&task, this](task_list& tasks)
+            {
+              tasks.emplace_back(std::move(task));
+            });
       }
 
       void clear()
       {
-        callbacks_.access([&](task_list& tasks)
-        {
-          this->merge_callbacks();
-          tasks.clear();
-        });
+        callbacks_.access(
+            [&](task_list& tasks)
+            {
+              this->merge_callbacks();
+              tasks.clear();
+            });
       }
 
       void execute()
       {
-        callbacks_.access([&](task_list& tasks)
-        {
-          this->merge_callbacks();
-
-          for (auto i = tasks.begin(); i != tasks.end();)
-          {
-            const auto now = std::chrono::high_resolution_clock::now();
-            const auto diff = now - i->last_call;
-
-            if (diff < i->interval)
+        callbacks_.access(
+            [&](task_list& tasks)
             {
-              ++i;
-              continue;
-            }
+              this->merge_callbacks();
 
-            i->last_call = now;
+              for (auto i = tasks.begin(); i != tasks.end();)
+              {
+                const auto now = std::chrono::high_resolution_clock::now();
+                const auto diff = now - i->last_call;
 
-            const auto res = i->handler();
-            if (res == cond_end)
-            {
-              i = tasks.erase(i);
-            }
-            else
-            {
-              ++i;
-            }
-          }
-        });
+                if (diff < i->interval)
+                {
+                  ++i;
+                  continue;
+                }
+
+                i->last_call = now;
+
+                const auto res = i->handler();
+                if (res == cond_end)
+                {
+                  i = tasks.erase(i);
+                }
+                else
+                {
+                  ++i;
+                }
+              }
+            });
       }
 
      private:
@@ -79,17 +82,20 @@ namespace scheduler
 
       void merge_callbacks()
       {
-        callbacks_.access([&](task_list& tasks)
-        {
-          new_callbacks_.access([&](task_list& new_tasks)
-          {
-            tasks.insert(
-                tasks.end(),
-                std::move_iterator<task_list::iterator>(new_tasks.begin()),
-                std::move_iterator<task_list::iterator>(new_tasks.end()));
-            new_tasks = {};
-          });
-        });
+        callbacks_.access(
+            [&](task_list& tasks)
+            {
+              new_callbacks_.access(
+                  [&](task_list& new_tasks)
+                  {
+                    tasks.insert(tasks.end(),
+                                 std::move_iterator<task_list::iterator>(
+                                     new_tasks.begin()),
+                                 std::move_iterator<task_list::iterator>(
+                                     new_tasks.end()));
+                    new_tasks = {};
+                  });
+            });
       }
     };
 
@@ -160,14 +166,15 @@ namespace scheduler
    public:
     void post_unpack() override
     {
-      thread = std::thread([]()
-      {
-        while (true)
-        {
-          execute(pipeline::async);
-          std::this_thread::sleep_for(10ms);
-        }
-      });
+      thread = std::thread(
+          []()
+          {
+            while (true)
+            {
+              execute(pipeline::async);
+              std::this_thread::sleep_for(10ms);
+            }
+          });
 
       async_thread_id = thread.get_id();
 

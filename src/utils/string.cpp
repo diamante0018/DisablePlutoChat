@@ -37,20 +37,26 @@ namespace utils::string
 
   std::string to_lower(std::string text)
   {
-    std::transform(
-        text.begin(), text.end(), text.begin(), [](const char input) {
-          return static_cast<char>(tolower(input));
-        });
+    std::transform(text.begin(),
+                   text.end(),
+                   text.begin(),
+                   [](const char input)
+                   {
+                     return static_cast<char>(tolower(input));
+                   });
 
     return text;
   }
 
   std::string to_upper(std::string text)
   {
-    std::transform(
-        text.begin(), text.end(), text.begin(), [](const char input) {
-          return static_cast<char>(toupper(input));
-        });
+    std::transform(text.begin(),
+                   text.end(),
+                   text.begin(),
+                   [](const char input)
+                   {
+                     return static_cast<char>(toupper(input));
+                   });
 
     return text;
   }
