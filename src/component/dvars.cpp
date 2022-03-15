@@ -55,7 +55,7 @@ namespace dvars
     bool find_dvar(std::unordered_set<std::string>& set,
                    const std::string& name)
     {
-      return set.find(name) != set.end();
+      return set.contains(name);
     }
   } // namespace
 

@@ -22,12 +22,12 @@ namespace movement
     assert(pm->ps != nullptr);
 
     float scale{};
-    const auto* playerState = pm->ps;
+    const auto* player_state = pm->ps;
 
-    if (playerState->viewHeightLerpTime != 0 &&
-        playerState->viewHeightLerpTarget == 0xB)
+    if (player_state->viewHeightLerpTime != 0 &&
+        player_state->viewHeightLerpTarget == 0xB)
     {
-      scale = pm->cmd.serverTime - playerState->viewHeightLerpTime / 400.0f;
+      scale = pm->cmd.serverTime - player_state->viewHeightLerpTime / 400.0f;
       if (0.0f <= scale)
       {
         if (scale > 1.0f)
@@ -43,11 +43,11 @@ namespace movement
       }
     }
 
-    if ((playerState->viewHeightLerpTime != 0 &&
-         playerState->viewHeightLerpTarget == 0x28) &&
-        playerState->viewHeightLerpDown == 0)
+    if ((player_state->viewHeightLerpTime != 0 &&
+         player_state->viewHeightLerpTarget == 0x28) &&
+        player_state->viewHeightLerpDown == 0)
     {
-      scale = 400.0f / pm->cmd.serverTime - playerState->viewHeightLerpTime;
+      scale = 400.0f / pm->cmd.serverTime - player_state->viewHeightLerpTime;
       if (0.0f <= scale)
       {
         if (scale > 1.0f)
@@ -62,7 +62,7 @@ namespace movement
     }
 
     scale = 1.0f;
-    const auto stance = game::PM_GetEffectiveStance(playerState);
+    const auto stance = game::PM_GetEffectiveStance(player_state);
 
     if (stance == game::PM_EFF_STANCE_PRONE)
     {
@@ -71,8 +71,8 @@ namespace movement
 
     if (stance == game::PM_EFF_STANCE_DUCKED)
     {
-      if ((playerState->pm_flags & game::PMF_SPRINTING) == 0 ||
-          (playerState->perks[0] & 0x1000u) == 0)
+      if ((player_state->pm_flags & game::PMF_SPRINTING) == 0 ||
+          (player_state->perks[0] & 0x1000u) == 0)
       {
         return player_duckedSpeedScale->current.value;
       }
@@ -120,7 +120,7 @@ namespace movement
       return 0.0f;
     }
 
-    auto total = std::sqrtf(forward_move * forward_move +
+    const auto total = std::sqrtf(forward_move * forward_move +
                             right_move * right_move + up_move * up_move);
     auto scale = (ps->speed * max) / (127.0f * total);
 
@@ -209,10 +209,10 @@ namespace movement
 
   void pm_trace_stub(game::pmove_t* pm, game::trace_t* results,
                      const float* start, const float* end,
-                     const game::Bounds* bounds, int passEntityNum,
-                     int contentMask)
+                     const game::Bounds* bounds, int pass_entity_num,
+                     int content_mask)
   {
-    game::PM_trace(pm, results, start, end, bounds, passEntityNum, contentMask);
+    game::PM_trace(pm, results, start, end, bounds, pass_entity_num, content_mask);
 
     if (bg_elevators->current.enabled)
     {
@@ -222,11 +222,11 @@ namespace movement
 
   void pm_player_trace_stub(game::pmove_t* pm, game::trace_t* results,
                             const float* start, const float* end,
-                            const game::Bounds* bounds, int passEntityNum,
-                            int contentMask)
+                            const game::Bounds* bounds, int pass_entity_num,
+                            int content_mask)
   {
     game::PM_playerTrace(
-        pm, results, start, end, bounds, passEntityNum, contentMask);
+        pm, results, start, end, bounds, pass_entity_num, content_mask);
 
     if (bg_elevators->current.enabled)
     {
@@ -238,7 +238,8 @@ namespace movement
   {
     if (params.size() < 2) return;
 
-    auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
+    const auto player_num = std::atoi(params.get(1));
+    auto* const g_client = game::g_entities[player_num].client;
 
     if (g_client == nullptr) return;
 
@@ -249,7 +250,8 @@ namespace movement
   {
     if (params.size() < 2) return;
 
-    auto* g_client = game::g_entities[std::atoi(params.get(1))].client;
+    const auto player_num = std::atoi(params.get(1));
+    auto* g_client = game::g_entities[player_num].client;
 
     if (g_client == nullptr) return;
 

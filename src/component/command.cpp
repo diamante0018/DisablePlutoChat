@@ -21,14 +21,14 @@ namespace command
         return;
       }
 
-      const auto playerNum = std::atoi(params.get(1));
+      const auto player_num = std::atoi(params.get(1));
 
-      if (playerNum >= *game::svs_clientCount)
+      if (player_num >= *game::svs_clientCount)
       {
         return;
       }
 
-      const auto player = &game::g_entities[playerNum];
+      auto* const player = &game::g_entities[player_num];
 
       if (player->client == nullptr) return;
 
@@ -41,9 +41,10 @@ namespace command
     params params = {};
 
     const auto command = utils::string::to_lower(params[0]);
-    if (handlers.find(command) != handlers.end())
+
+    if (const auto got = handlers.find(command); got != handlers.end())
     {
-      handlers[command](params);
+      got->second(params);
     }
   }
 
@@ -92,7 +93,7 @@ namespace command
   {
     const auto command = utils::string::to_lower(name);
 
-    if (handlers.find(command) == handlers.end())
+    if (!handlers.contains(command))
     {
       add_raw(name, main_handler);
     }

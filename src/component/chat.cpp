@@ -14,10 +14,11 @@ namespace chat
     static std::unordered_set<std::int32_t> mute_list{};
     game::dvar_t* sv_enableGameChat;
 
-    void client_command_stub(int clientNum)
+    void client_command_stub(int client_num)
     {
       char cmd[1024]{};
-      game::gentity_s* ent = &game::g_entities[clientNum];
+      const auto* ent = &game::g_entities[client_num];
+
       if (ent->client == nullptr)
       {
         // Not fully in game yet
@@ -30,18 +31,18 @@ namespace chat
       {
         std::unique_lock<std::mutex> _(access_mutex);
         if (!sv_enableGameChat->current.enabled ||
-            mute_list.contains(clientNum))
+            mute_list.contains(client_num))
         {
           game::Cbuf_InsertText(
               0,
               utils::string::va(
                   "tell %d \"You are not allowed to type in the chat\"",
-                  clientNum));
+                  client_num));
           return;
         }
       }
 
-      reinterpret_cast<void (*)(int)>(0x502CB0)(clientNum);
+      reinterpret_cast<void (*)(int)>(0x502CB0)(client_num);
     }
 
     void cmd_mute_player_f(const command::params& params)
@@ -52,20 +53,20 @@ namespace chat
       }
 
       const auto input = params.get(1);
-      const auto playerNum = std::atoi(input);
+      const auto player_num = std::atoi(input);
 
-      if (playerNum >= *game::svs_clientCount)
+      if (player_num >= *game::svs_clientCount)
       {
         return;
       }
 
       std::unique_lock<std::mutex> _(access_mutex);
-      if (mute_list.contains(playerNum))
+      if (mute_list.contains(player_num))
       {
         return;
       }
 
-      mute_list.insert(playerNum);
+      mute_list.insert(player_num);
     }
 
     void cmd_umute_player_f(const command::params& params)
@@ -76,20 +77,20 @@ namespace chat
       }
 
       const auto input = params.get(1);
-      const auto playerNum = std::atoi(input);
+      const auto player_num = std::atoi(input);
 
-      if (playerNum >= *game::svs_clientCount)
+      if (player_num >= *game::svs_clientCount)
       {
         return;
       }
 
       std::unique_lock<std::mutex> _(access_mutex);
-      if (!mute_list.contains(playerNum))
+      if (!mute_list.contains(player_num))
       {
         return;
       }
 
-      mute_list.erase(playerNum);
+      mute_list.erase(player_num);
     }
   } // namespace
 
