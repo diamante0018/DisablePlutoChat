@@ -121,7 +121,7 @@ namespace movement
     }
 
     const auto total = std::sqrtf(forward_move * forward_move +
-                            right_move * right_move + up_move * up_move);
+                                  right_move * right_move + up_move * up_move);
     auto scale = (ps->speed * max) / (127.0f * total);
 
     if (ps->pm_flags & game::PMF_WALKING)
@@ -212,7 +212,8 @@ namespace movement
                      const game::Bounds* bounds, int pass_entity_num,
                      int content_mask)
   {
-    game::PM_trace(pm, results, start, end, bounds, pass_entity_num, content_mask);
+    game::PM_trace(
+        pm, results, start, end, bounds, pass_entity_num, content_mask);
 
     if (bg_elevators->current.enabled)
     {
