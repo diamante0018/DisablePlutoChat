@@ -2,14 +2,14 @@
 
 #include "../loader/component_loader.hpp"
 
-#include "scheduler.hpp"
 #include <utils/concurrency.hpp>
 #include <utils/hook.hpp>
+#include <utils/thread.hpp>
+
+#include "scheduler.hpp"
 
 namespace scheduler
 {
-  std::thread::id async_thread_id;
-
   namespace
   {
     struct task
@@ -99,6 +99,7 @@ namespace scheduler
       }
     };
 
+    volatile bool kill = false;
     std::thread thread;
     task_pipeline pipelines[pipeline::count];
 
@@ -159,26 +160,32 @@ namespace scheduler
         delay);
   }
 
-  unsigned int thread_id;
-
   class component final : public component_interface
   {
    public:
     void post_unpack() override
     {
-      thread = std::thread(
+      thread = utils::thread::create_named_thread(
+          "Async Scheduler",
           []()
           {
-            while (true)
+            while (!kill)
             {
               execute(pipeline::async);
               std::this_thread::sleep_for(10ms);
             }
           });
 
-      async_thread_id = thread.get_id();
-
       utils::hook::call(0x50CEDC, server_frame_stub);
+    }
+
+    void pre_destroy() override
+    {
+      kill = true;
+      if (thread.joinable())
+      {
+        thread.join();
+      }
     }
   };
 } // namespace scheduler
