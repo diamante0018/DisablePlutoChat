@@ -1,8 +1,8 @@
-#include <stdinc.hpp>
+#include <std_include.hpp>
+#include "../loader/component_loader.hpp"
 
-#include "loader/component_loader.hpp"
-#include "utils/hook.hpp"
-#include "utils/string.hpp"
+#include <utils/hook.hpp>
+#include <utils/string.hpp>
 
 #include "command.hpp"
 
@@ -11,8 +11,11 @@ namespace chat
   namespace
   {
     std::mutex access_mutex;
-    static std::unordered_set<std::int32_t> mute_list{};
+    std::unordered_set<std::int32_t> mute_list{};
+
     game::dvar_t* sv_enableGameChat;
+
+    utils::hook::detour client_command_hook;
 
     void client_command_stub(int client_num)
     {
@@ -42,7 +45,7 @@ namespace chat
         }
       }
 
-      reinterpret_cast<void (*)(int)>(0x502CB0)(client_num);
+      client_command_hook.invoke<void>(client_num);
     }
 
     void cmd_mute_player_f(const command::params& params)
@@ -99,7 +102,8 @@ namespace chat
    public:
     void post_unpack() override
     {
-      utils::hook::call(0x57192A, client_command_stub);
+      client_command_hook.create(0x502CB0, &client_command_stub);
+
       add_chat_commands();
 
       sv_enableGameChat = game::Dvar_RegisterBool(

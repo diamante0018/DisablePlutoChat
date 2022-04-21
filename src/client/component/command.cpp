@@ -1,8 +1,8 @@
-#include <stdinc.hpp>
+#include <std_include.hpp>
+#include "../loader/component_loader.hpp"
 
-#include "loader/component_loader.hpp"
-#include "utils/nt.hpp"
-#include "utils/string.hpp"
+#include <utils/nt.hpp>
+#include <utils/string.hpp>
 
 #include "command.hpp"
 
@@ -110,40 +110,12 @@ namespace command
         });
   }
 
-  std::vector<std::string> script_commands;
-  utils::memory::allocator allocator;
-
-  void add_script_command(const std::string& name,
-                          const std::function<void(const params&)>& callback)
-  {
-    script_commands.push_back(name);
-    const auto _name = allocator.duplicate_string(name);
-    add(_name, callback);
-  }
-
-  void clear_script_commands()
-  {
-    for (const auto& name : script_commands)
-    {
-      handlers.erase(name);
-      game::Cmd_RemoveCommand(name.data());
-    }
-
-    allocator.clear();
-    script_commands.clear();
-  }
-
   class component final : public component_interface
   {
    public:
     void post_unpack() override
     {
       add_commands_generic();
-    }
-
-    void pre_destroy() override
-    {
-      clear_script_commands();
     }
 
    private:

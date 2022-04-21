@@ -85,13 +85,36 @@ filter "configurations:Debug"
 	defines {"DEBUG", "_DEBUG"}
 filter {}
 
-project "pluto-disable-chat"
+project "common"
+kind "StaticLib"
+language "C++"
+
+files {"./src/common/**.hpp", "./src/common/**.cpp"}
+
+includedirs {"./src/common", "%{prj.location}/src"}
+
+resincludedirs {"$(ProjectDir)src"}
+
+dependencies.imports()
+
+project "client"
 kind "SharedLib"
 language "C++"
 
-files {"./src/**.hpp", "./src/**.cpp"}
+targetname "pluto-disable-chat"
 
-includedirs {"src"}
+pchheader "std_include.hpp"
+pchsource "src/client/std_include.cpp"
+
+linkoptions {"/IGNORE:4254", "/PDBCompress"}
+
+files {"./src/client/**.hpp", "./src/client/**.cpp"}
+
+includedirs {"./src/client", "./src/common", "%{prj.location}/src"}
+
+resincludedirs {"$(ProjectDir)src"}
+
+links {"common"}
 
 if _OPTIONS["copy-to"] then
 	postbuildcommands {"copy /y \"$(TargetPath)\" \"" .. _OPTIONS["copy-to"] .. "\""}

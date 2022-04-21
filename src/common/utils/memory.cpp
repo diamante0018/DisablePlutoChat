@@ -14,7 +14,7 @@ namespace utils
   {
     std::lock_guard _(this->mutex_);
 
-    for (auto& data : this->pool_)
+    for (const auto& data : this->pool_)
     {
       memory::free(data);
     }
@@ -78,7 +78,7 @@ namespace utils
   {
     if (data)
     {
-      ::free(data);
+      std::free(data);
     }
   }
 
@@ -135,10 +135,10 @@ namespace utils
     return true;
   }
 
-  bool memory::is_rdata_ptr(void* pointer)
+  bool memory::is_rdata_ptr(void* ptr)
   {
     const std::string rdata = ".rdata";
-    const auto pointer_lib = utils::nt::library::get_by_address(pointer);
+    const auto pointer_lib = utils::nt::library::get_by_address(ptr);
 
     for (const auto& section : pointer_lib.get_section_headers())
     {
@@ -149,7 +149,7 @@ namespace utils
 
       if (name == rdata)
       {
-        const auto target = size_t(pointer);
+        const auto target = size_t(ptr);
         const size_t source_start =
             size_t(pointer_lib.get_ptr()) + section->PointerToRawData;
         const size_t source_end = source_start + section->SizeOfRawData;

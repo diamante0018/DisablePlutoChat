@@ -19,6 +19,17 @@ namespace game
     ERR_MAPLOADERRORSUMMARY = 0x7
   } errorParm_t;
 
+  enum LocalClientNum_t
+  {
+    LOCAL_CLIENT_INVALID = -1,
+    LOCAL_CLIENT_0 = 0x0,
+    LOCAL_CLIENT_1 = 0x1,
+    LOCAL_CLIENT_2 = 0x2,
+    LOCAL_CLIENT_3 = 0x3,
+    LOCAL_CLIENT_LAST = 0x3,
+    LOCAL_CLIENT_COUNT = 0x4,
+  };
+
   struct StringTableCell
   {
     const char* string;
@@ -143,7 +154,7 @@ namespace game
 
   typedef void(__cdecl* scr_call_t)(int entref);
 
-  typedef enum
+  enum class scriptAnimEventTypes_t
   {
     ANIM_ET_PAIN,
     ANIM_ET_DEATH,
@@ -168,7 +179,7 @@ namespace game
     ANIM_ET_SHELLSHOCK,
     ANIM_ET_STUNNED,
     NUM_ANIM_EVENTTYPES
-  } scriptAnimEventTypes_t;
+  };
 
   typedef enum
   {
@@ -567,6 +578,61 @@ namespace game
     PMF_REMOTE_CONTROLLING = 0x80000,
     PMF_ANIM_SCRIPTED = 0x100000,
     PMF_DIVING = 0x400000
+  };
+
+  enum playerWeaponFlag
+  {
+    PWF_USE_RELOAD = 0x1,
+    PWF_USING_OFFHAND = 0x2,
+    PWF_HOLDING_BREATH = 0x4,
+    PWF_FRIENDLY_FIRE = 0x8,
+    PWF_ENEMY_FIRE = 0x10,
+    PWF_NO_ADS = 0x20,
+    PWF_USING_NIGHTVISION = 0x40,
+    PWF_DISABLE_WEAPONS = 0x80,
+    PWF_TRIGGER_LEFT_FIRE = 0x100,
+    PWF_TRIGGER_DOUBLE_FIRE = 0x200,
+    PWF_USING_RECOILSCALE = 0x400,
+    PWF_DISABLE_WEAPON_SWAPPING = 0x800,
+    PWF_DISABLE_OFFHAND_WEAPONS = 0x1000,
+    PWF_SWITCHING_TO_RIOTSHIELD = 0x2000,
+    PWF_BLAST_IMPACT = 0x4000,
+    PWF_DISABLE_WEAPON_PICKUP = 0x10000,
+    PWF_SWITCHING_PRIMARIES = 0x20000,
+  };
+
+  enum playerEFlag
+  {
+    EF_NONSOLID_BMODE = 0x1,
+    EF_TELEPORT_BIT = 0x2,
+    EF_CROUCHING = 0x4,
+    EF_PRONE = 0x8,
+    EF_NODRAW = 0x20,
+    EF_TIMED_OBJECT = 0x40,
+    EF_VOTED = 0x80,
+    EF_TALK = 0x100,
+    EF_COMPASS_PING = 0x200,
+    EF_TURRET_ACTIVE_PRONE = 0x800,
+    EF_TURRET_ACTIVE_DUCK = 0x1000,
+    EF_AIM_ASSIST = 0x4000,
+    EF_LOOP_RUMBLE = 0x8000,
+    EF_LASER_SIGHT = 0x10000,
+    EF_MANTLE = 0x20000,
+    EF_DEAD = 0x40000,
+    EF_ADS = 0x80000,
+    EF_NEW = 0x100000,
+    EF_VEHICLE_ACTIVE = 0x200000,
+    EF_JAMMING = 0x400000,
+    EF_FIRING = 0x800000,
+  };
+
+  enum animBodyPart_t
+  {
+    ANIM_BP_UNUSED = 0x0,
+    ANIM_BP_LEGS = 0x1,
+    ANIM_BP_TORSO = 0x2,
+    ANIM_BP_BOTH = 0x3,
+    NUM_ANIM_BODYPARTS = 0x4,
   };
 
   enum clientState_t : std::int32_t
@@ -1013,5 +1079,16 @@ namespace game
     float previous_origin[3];
     float previous_velocity[3];
     int holdrand;
+  };
+
+  struct pmoveHandler_t
+  {
+    void(__cdecl* trace)(trace_t*, const float*, const float*, const Bounds*,
+                         int, int);
+    void(__cdecl* playerEvent)(int, int);
+    Weapon(__cdecl* playerTurret)(const playerState_s*, LocalClientNum_t);
+    int(__cdecl* entityOrigin)(LocalClientNum_t, int, float*);
+    int(__cdecl* entityVelocity)(LocalClientNum_t, int, float*);
+    const void*(__cdecl* entityState)(LocalClientNum_t, int);
   };
 } // namespace game

@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include "memory.hpp"
 
 #ifndef ARRAYSIZE
@@ -37,7 +36,7 @@ namespace utils::string
       while (true)
       {
         const int res =
-            vsnprintf_s(entry->buffer, entry->size, _TRUNCATE, format, ap);
+            _vsnprintf_s(entry->buffer, entry->size, _TRUNCATE, format, ap);
         if (res > 0) break; // Success
         if (res == 0) return nullptr; // Error
 
@@ -101,13 +100,9 @@ namespace utils::string
 
   std::string get_clipboard_data();
 
-  void strip(const char* in, char* out, int max);
-
   std::string convert(const std::wstring& wstr);
   std::wstring convert(const std::string& str);
 
   std::string replace(std::string str, const std::string& from,
                       const std::string& to);
-
-  bool contains(const std::string& str1, const std::string& str2);
 } // namespace utils::string

@@ -1,16 +1,16 @@
-#include <stdinc.hpp>
+#include <std_include.hpp>
+#include "../loader/component_loader.hpp"
 
-#include "loader/component_loader.hpp"
-#include "utils/hook.hpp"
+#include <utils/hook.hpp>
 
 namespace melee
 {
   game::dvar_t* g_allowMelee;
-  void fire_melee_stub(game::gentity_s* ent, int a2)
+  void fire_melee_stub(game::gentity_s* ent, int game_time)
   {
     if (g_allowMelee->current.enabled)
     {
-      reinterpret_cast<void (*)(game::gentity_s*, int)>(0x530DB0)(ent, a2);
+      utils::hook::invoke<void>(0x530DB0, ent, game_time);
     }
   }
 

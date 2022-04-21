@@ -1,7 +1,7 @@
-#include <stdinc.hpp>
+#include <std_include.hpp>
 
-#include "loader/component_loader.hpp"
-#include "utils/hook.hpp"
+#include "../loader/component_loader.hpp"
+#include <utils/hook.hpp>
 
 #include "command.hpp"
 
@@ -198,7 +198,7 @@ namespace movement
   {
     if (player_activate_slowdown->current.enabled)
     {
-      reinterpret_cast<void (*)(game::playerState_s*)>(0x4161C0)(ps);
+      utils::hook::invoke<void>(0x4161C0, ps);
     }
   }
 
