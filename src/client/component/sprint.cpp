@@ -17,7 +17,7 @@ namespace sprint
             ps->viewHeightCurrent >= CROUCH_VIEWHEIGHT);
   }
 
-// clang-format off
+  // clang-format off
   __declspec(naked) void pm_start_sprint_stub()
   {
     __asm
@@ -46,7 +46,7 @@ namespace sprint
       ret;
     }
   }
-// clang-format on
+  // clang-format on
 
   class sprint final : public component_interface
   {
