@@ -89,15 +89,15 @@ namespace movement
   {
     __asm
     {
-      pushad
+      pushad;
 
-      push edx
-      call pm_cmd_scale_for_stance
-      add esp, 4
+      push edx;
+      call pm_cmd_scale_for_stance;
+      add esp, 4;
 
-      popad
+      popad;
 
-      ret
+      ret;
     }
   }
 

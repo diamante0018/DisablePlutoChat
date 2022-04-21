@@ -10,44 +10,44 @@ constexpr auto DEAD_VIEWHEIGHT = 8;
 
 namespace sprint
 {
-  namespace
+
+  bool check_target_view_height(const game::playerState_s* ps)
   {
-    bool check_target_view_height(const game::playerState_s* ps)
+    return (ps->viewHeightCurrent <= PRONE_VIEWHEIGHT ||
+            ps->viewHeightCurrent >= CROUCH_VIEWHEIGHT);
+  }
+
+// clang-format off
+  __declspec(naked) void pm_start_sprint_stub()
+  {
+    __asm
     {
-      return (ps->viewHeightCurrent <= PRONE_VIEWHEIGHT ||
-              ps->viewHeightCurrent >= CROUCH_VIEWHEIGHT);
+      // Patch animation glitch
+      pushad;
+
+      push esi; // ps
+      call check_target_view_height;
+      add esp, 4;
+
+      test al, al;
+
+      popad;
+
+      jz skip; // If false was returned skip PM_StartSprint
+
+      test ah, 0x41; // Game code hook skipped
+      jnz skip;
+
+      push 0x41D67A; // Inlined 'call' to PM_StartSprint
+      ret;
+
+     skip:
+      push 0x41D6A5;
+      ret;
     }
+  }
+// clang-format on
 
-    __declspec(naked) void pm_start_sprint_stub()
-    {
-      __asm {
-        pushad
-
-        push esi // ps
-        call check_target_view_height
-        add esp, 4
-
-        test al, al
-
-        popad
-
-                // If false was returned skip PM_StartSprint
-        jz skip
-
-                    // Game code hook skipped
-        test ah, 0x41
-        jnz skip
-
-            // Inlined 'call' to PM_StartSprint
-        push 0x41D67A
-        retn
-
-      skip:
-        push 0x41D6A5
-        retn
-      }
-    }
-  } // namespace
   class sprint final : public component_interface
   {
    public:
