@@ -42,10 +42,10 @@ newoption {
 dependencies.load()
 
 workspace "pluto-disable-chat"
+startproject "client"
 location "./build"
 objdir "%{wks.location}/obj"
 targetdir "%{wks.location}/bin/%{cfg.platform}/%{cfg.buildcfg}"
-targetname "%{prj.name}"
 
 configurations {"Debug", "Release"}
 
@@ -66,7 +66,7 @@ if _OPTIONS["dev-build"] then
 	defines {"DEV_BUILD"}
 end
 
-flags {"NoIncrementalLink", "NoMinimalRebuild", "MultiProcessorCompile", "No64BitChecks" }
+flags {"NoIncrementalLink", "NoMinimalRebuild", "MultiProcessorCompile", "No64BitChecks"}
 
 filter "platforms:Win*"
 	defines {"_WINDOWS", "WIN32"}

@@ -989,6 +989,8 @@ namespace game
     char __pad1[0x78658];
   };
 
+#pragma pack(pop)
+
   static_assert(sizeof(client_s) == 0x78698);
 
   struct EntHandle
@@ -1012,8 +1014,6 @@ namespace game
     int health;
     char __pad2[212];
   };
-
-#pragma pack(pop)
 
   static_assert(sizeof(gentity_s) == 628);
 

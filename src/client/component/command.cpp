@@ -121,7 +121,6 @@ namespace command
    private:
     static void add_commands_generic()
     {
-      add("quitMeme", utils::nt::raise_hard_exception);
       add("sayAsPlayer", cmd_say_as_player_f);
     }
   };

@@ -51,12 +51,6 @@ namespace dvars
 
       return nullptr;
     }
-
-    bool find_dvar(std::unordered_set<std::string>& set,
-                   const std::string& name)
-    {
-      return set.contains(name);
-    }
   } // namespace
 
   namespace override

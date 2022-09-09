@@ -89,10 +89,8 @@ namespace scheduler
                   [&](task_list& new_tasks)
                   {
                     tasks.insert(tasks.end(),
-                                 std::move_iterator<task_list::iterator>(
-                                     new_tasks.begin()),
-                                 std::move_iterator<task_list::iterator>(
-                                     new_tasks.end()));
+                                 std::move_iterator(new_tasks.begin()),
+                                 std::move_iterator(new_tasks.end()));
                     new_tasks = {};
                   });
             });
@@ -167,7 +165,7 @@ namespace scheduler
     {
       thread = utils::thread::create_named_thread(
           "Async Scheduler",
-          []()
+          []
           {
             while (!kill)
             {

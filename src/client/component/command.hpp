@@ -7,9 +7,9 @@ namespace command
    public:
     params();
 
-    int size() const;
-    const char* get(int index) const;
-    std::string join(int index) const;
+    [[nodiscard]] int size() const;
+    [[nodiscard]] const char* get(int index) const;
+    [[nodiscard]] std::string join(int index) const;
 
     const char* operator[](const int index) const
     {

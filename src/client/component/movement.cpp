@@ -7,99 +7,11 @@
 
 namespace movement
 {
-  game::dvar_t* player_lastStandCrawlSpeedScale;
-  game::dvar_t* player_duckedSpeedScale;
-  game::dvar_t* player_proneSpeedScale;
-  game::dvar_t* player_activate_slowdown;
   game::dvar_t* player_spectateSpeedScale;
   game::dvar_t* cg_ufoScaler;
   game::dvar_t* cg_noclipScaler;
   game::dvar_t* bg_bouncesAllAngles;
   game::dvar_t* bg_elevators;
-
-  float pm_cmd_scale_for_stance(const game::pmove_t* pm)
-  {
-    assert(pm->ps != nullptr);
-
-    float scale{};
-    const auto* player_state = pm->ps;
-
-    if (player_state->viewHeightLerpTime != 0 &&
-        player_state->viewHeightLerpTarget == 0xB)
-    {
-      scale = pm->cmd.serverTime - player_state->viewHeightLerpTime / 400.0f;
-      if (0.0f <= scale)
-      {
-        if (scale > 1.0f)
-        {
-          scale = 1.0f;
-          return scale * 0.15f + (1.0f - scale) * 0.65f;
-        }
-
-        if (scale != 0.0f)
-        {
-          return scale * 0.15f + (1.0f - scale) * 0.65f;
-        }
-      }
-    }
-
-    if ((player_state->viewHeightLerpTime != 0 &&
-         player_state->viewHeightLerpTarget == 0x28) &&
-        player_state->viewHeightLerpDown == 0)
-    {
-      scale = 400.0f / pm->cmd.serverTime - player_state->viewHeightLerpTime;
-      if (0.0f <= scale)
-      {
-        if (scale > 1.0f)
-        {
-          scale = 1.0f;
-        }
-        else if (scale != 0.0f)
-        {
-          return scale * 0.65f + (1.0f - scale) * 0.15f;
-        }
-      }
-    }
-
-    scale = 1.0f;
-    const auto stance = game::PM_GetEffectiveStance(player_state);
-
-    if (stance == game::PM_EFF_STANCE_PRONE)
-    {
-      return player_proneSpeedScale->current.value;
-    }
-
-    if (stance == game::PM_EFF_STANCE_DUCKED)
-    {
-      if ((player_state->pm_flags & game::PMF_SPRINTING) == 0 ||
-          (player_state->perks[0] & 0x1000u) == 0)
-      {
-        return player_duckedSpeedScale->current.value;
-      }
-    }
-    if (stance == game::PM_EFF_STANCE_LASTSTANDCRAWL)
-    {
-      return player_lastStandCrawlSpeedScale->current.value;
-    }
-
-    return scale;
-  }
-
-  __declspec(naked) void pm_cmd_scale_for_stance_stub()
-  {
-    __asm
-    {
-      pushad;
-
-      push edx;
-      call pm_cmd_scale_for_stance;
-      add esp, 4;
-
-      popad;
-
-      ret;
-    }
-  }
 
   float pm_move_scale(game::playerState_s* ps, float forward_move,
                       float right_move, float up_move)
@@ -122,7 +34,7 @@ namespace movement
 
     const auto total = std::sqrtf(forward_move * forward_move +
                                   right_move * right_move + up_move * up_move);
-    auto scale = (ps->speed * max) / (127.0f * total);
+    auto scale = (static_cast<float>(ps->speed) * max) / (127.0f * total);
 
     if (ps->pm_flags & game::PMF_WALKING)
     {
@@ -171,7 +83,7 @@ namespace movement
     const auto length_squared_2d =
         vel_in[0] * vel_in[0] + vel_in[1] * vel_in[1];
 
-    if (std::fabsf(normal[2]) < 0.001f || length_squared_2d == 0.0)
+    if (std::fabsf(normal[2]) < 0.001f || length_squared_2d == 0.0f)
     {
       vel_out[0] = vel_in[0];
       vel_out[1] = vel_in[1];
@@ -192,19 +104,6 @@ namespace movement
       vel_out[1] = vel_in[1] * length_scale;
       vel_out[2] = new_z * length_scale;
     }
-  }
-
-  void jump_activate_slowdown_stub(game::playerState_s* ps)
-  {
-    if (player_activate_slowdown->current.enabled)
-    {
-      utils::hook::invoke<void>(0x4161C0, ps);
-    }
-  }
-
-  int is_prone_allowed_stub()
-  {
-    return TRUE;
   }
 
   void pm_trace_stub(game::pmove_t* pm, game::trace_t* results,
@@ -267,14 +166,6 @@ namespace movement
     {
       register_dvars();
 
-      utils::hook::call(0x42228B, pm_cmd_scale_for_stance_stub);
-      utils::hook::call(0x422D16, pm_cmd_scale_for_stance_stub);
-      utils::hook::call(0x422D3F, pm_cmd_scale_for_stance_stub);
-
-      utils::hook::call(0x41FA40, jump_activate_slowdown_stub);
-
-      utils::hook::call(0x41F793, is_prone_allowed_stub);
-
       utils::hook::call(0x41F995, pm_trace_stub);
       utils::hook::call(0x41F8D8, pm_trace_stub);
       utils::hook::call(0x41F941, pm_trace_stub);
@@ -300,33 +191,6 @@ namespace movement
 
     static void register_dvars()
     {
-      player_lastStandCrawlSpeedScale =
-          game::Dvar_FindVar("player_lastStandCrawlSpeedScale");
-      player_spectateSpeedScale =
-          game::Dvar_FindVar("player_spectateSpeedScale");
-
-      player_duckedSpeedScale = game::Dvar_RegisterFloat(
-          "player_duckedSpeedScale",
-          0.65f,
-          0.0f,
-          5.0f,
-          game::CHEAT | game::CODINFO,
-          "The scale applied to the player speed when ducking");
-
-      player_proneSpeedScale = game::Dvar_RegisterFloat(
-          "player_proneSpeedScale",
-          0.15f,
-          0.0f,
-          5.0f,
-          game::CHEAT | game::CODINFO,
-          "The scale applied to the player speed when crawling");
-
-      player_activate_slowdown =
-          game::Dvar_RegisterBool("player_activate_slowdown",
-                                  true,
-                                  game::CHEAT | game::CODINFO,
-                                  "Slow the player down");
-
       bg_elevators = game::Dvar_RegisterBool("bg_elevators",
                                              false,
                                              game::CHEAT | game::CODINFO,

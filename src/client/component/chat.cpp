@@ -32,7 +32,7 @@ namespace chat
 
       if (utils::string::starts_with(cmd, "say"))
       {
-        std::unique_lock<std::mutex> _(access_mutex);
+        std::unique_lock _(access_mutex);
         if (!sv_enableGameChat->current.enabled ||
             mute_list.contains(client_num))
         {
@@ -63,7 +63,7 @@ namespace chat
         return;
       }
 
-      std::unique_lock<std::mutex> _(access_mutex);
+      std::unique_lock _(access_mutex);
       if (mute_list.contains(player_num))
       {
         return;
@@ -87,7 +87,7 @@ namespace chat
         return;
       }
 
-      std::unique_lock<std::mutex> _(access_mutex);
+      std::unique_lock _(access_mutex);
       if (!mute_list.contains(player_num))
       {
         return;
