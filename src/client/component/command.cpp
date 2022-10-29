@@ -22,7 +22,7 @@ namespace command
       }
 
       auto player_num = std::strtoul(params.get(1), nullptr, 10);
-      player_num = std::clamp<std::uint32_t>(player_num, 0, 18);
+      player_num = std::min<std::uint32_t>(player_num, 18);
 
       auto* const player = &game::g_entities[player_num];
 
