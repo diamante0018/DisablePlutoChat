@@ -55,13 +55,8 @@ namespace chat
         return;
       }
 
-      const auto input = params.get(1);
-      const auto player_num = std::atoi(input);
-
-      if (player_num >= *game::svs_clientCount)
-      {
-        return;
-      }
+      auto player_num = std::strtoul(params.get(1), nullptr, 10);
+      player_num = std::clamp<std::uint32_t>(player_num, 0, 18);
 
       std::unique_lock _(access_mutex);
       if (mute_list.contains(player_num))
@@ -79,13 +74,8 @@ namespace chat
         return;
       }
 
-      const auto input = params.get(1);
-      const auto player_num = std::atoi(input);
-
-      if (player_num >= *game::svs_clientCount)
-      {
-        return;
-      }
+      auto player_num = std::strtoul(params.get(1), nullptr, 10);
+      player_num = std::clamp<std::uint32_t>(player_num, 0, 18);
 
       std::unique_lock _(access_mutex);
       if (!mute_list.contains(player_num))

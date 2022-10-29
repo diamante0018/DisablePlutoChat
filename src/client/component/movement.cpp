@@ -138,7 +138,8 @@ namespace movement
   {
     if (params.size() < 2) return;
 
-    const auto player_num = std::atoi(params.get(1));
+    auto player_num = std::strtoul(params.get(1), nullptr, 10);
+    player_num = std::clamp<std::uint32_t>(player_num, 0, 18);
     auto* const g_client = game::g_entities[player_num].client;
 
     if (g_client == nullptr) return;
@@ -150,7 +151,8 @@ namespace movement
   {
     if (params.size() < 2) return;
 
-    const auto player_num = std::atoi(params.get(1));
+    auto player_num = std::strtoul(params.get(1), nullptr, 10);
+    player_num = std::clamp<std::uint32_t>(player_num, 0, 18);
     auto* g_client = game::g_entities[player_num].client;
 
     if (g_client == nullptr) return;
