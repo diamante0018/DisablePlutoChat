@@ -29,6 +29,8 @@ namespace game
    private:
     T* dedi_;
   };
+
+  constexpr std::size_t MAX_CLIENTS = 18;
 } // namespace game
 
 #include "symbols.hpp"

@@ -139,7 +139,7 @@ namespace movement
     if (params.size() < 2) return;
 
     auto player_num = std::strtoul(params.get(1), nullptr, 10);
-    player_num = std::min<std::uint32_t>(player_num, 18);
+    player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
     auto* const g_client = game::g_entities[player_num].client;
 
     if (g_client == nullptr) return;
@@ -152,7 +152,7 @@ namespace movement
     if (params.size() < 2) return;
 
     auto player_num = std::strtoul(params.get(1), nullptr, 10);
-    player_num = std::min<std::uint32_t>(player_num, 18);
+    player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
     auto* g_client = game::g_entities[player_num].client;
 
     if (g_client == nullptr) return;

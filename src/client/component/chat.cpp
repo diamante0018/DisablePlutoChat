@@ -56,7 +56,7 @@ namespace chat
       }
 
       auto player_num = std::strtoul(params.get(1), nullptr, 10);
-      player_num = std::min<std::uint32_t>(player_num, 18);
+      player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
 
       std::unique_lock _(access_mutex);
       if (mute_list.contains(player_num))
@@ -75,7 +75,7 @@ namespace chat
       }
 
       auto player_num = std::strtoul(params.get(1), nullptr, 10);
-      player_num = std::min<std::uint32_t>(player_num, 18);
+      player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
 
       std::unique_lock _(access_mutex);
       if (!mute_list.contains(player_num))
