@@ -150,6 +150,7 @@ namespace chat
     {
       if (params.size() < 2)
       {
+        printf("Usage: %s <client num>", params[0]);
         return;
       }
 
@@ -183,6 +184,7 @@ namespace chat
     {
       if (params.size() < 2)
       {
+        printf("Usage: %s <client num>", params[0]);
         return;
       }
 
