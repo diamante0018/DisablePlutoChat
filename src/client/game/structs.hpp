@@ -980,24 +980,61 @@ namespace game
     int hintForcedString;
   };
 
-#pragma pack(push, 1)
-  struct client_s
-  {
-    clientState_t state;
-    char __pad0[0x24];
-    netadr_s remote;
-    char __pad1[0x78658];
-  };
-
-#pragma pack(pop)
-
-  static_assert(sizeof(client_s) == 0x78698);
-
   struct EntHandle
   {
     unsigned __int16 number;
     unsigned __int16 infoIndex;
   };
+
+  struct netProfilePacket_t
+  {
+    int iTime;
+    int iSize;
+    int bFragment;
+  };
+
+  struct netProfileStream_t
+  {
+    netProfilePacket_t packets[60];
+    int iCurrPacket;
+    int iBytesPerSecond;
+    int iLastBPSCalcTime;
+    int iCountedPackets;
+    int iCountedFragments;
+    int iFragmentPercentage;
+    int iLargestPacket;
+    int iSmallestPacket;
+  };
+
+  struct netProfileInfo_t
+  {
+    netProfileStream_t send;
+    netProfileStream_t recieve;
+  };
+
+  static_assert(sizeof(netProfileInfo_t) == 0x5E0);
+
+  struct netchan_t
+  {
+    int outgoingSequence;
+    netsrc_t sock; // 28
+    int dropped; // 32
+    int incomingSequence; // 36
+    netadr_s remoteAddress; // 40
+    int qport;
+    int fragmentSequence;
+    int fragmentLength;
+    unsigned char* fragmentBuffer;
+    int fragmentBufferSize;
+    int unsentFragments;
+    int unsentFragmentStart;
+    int unsentLength;
+    unsigned char* unsentBuffer;
+    int unsentBufferSize;
+    netProfileInfo_t prof;
+  };
+
+  static_assert(sizeof(netchan_t) == 0x630);
 
   struct gentity_s
   {
@@ -1016,6 +1053,47 @@ namespace game
   };
 
   static_assert(sizeof(gentity_s) == 628);
+
+  struct clientHeader_t
+  {
+    clientState_t state; // 0
+    int sendAsActive; // 4
+    int deltaMessage; // 8
+    int rateDealyed; // 12 SV_SendMessageToClient
+    int hasAckedBaselineData; // 16
+    int hugeSnapshotSent; // 20
+    netchan_t netchan; // 24
+    vec3_t predictedOrigin;
+    int predictedOriginServerTime;
+    int migrationState;
+    vec3_t predictedVehicleOrigin;
+    int predictedVehicleServerTime;
+  };
+
+  static_assert(sizeof(clientHeader_t) == 1644);
+
+  struct svscmd_info_t
+  {
+    char cmd[1024];
+    int time;
+    int type;
+  };
+
+  static_assert(sizeof(svscmd_info_t) == 1032);
+
+  struct client_s
+  {
+    clientState_t state;
+    char __pad0[0x24];
+    netadr_s remoteAddress;
+    char __pad1[0x41C60];
+    char playerGuid[18];
+    char __pad2[0x369E4];
+  };
+
+  static_assert(offsetof(client_s, remoteAddress) == 0x28);
+  static_assert(offsetof(client_s, playerGuid) == 0x41CA0);
+  static_assert(sizeof(client_s) == 0x78698);
 
   struct TraceExtents
   {

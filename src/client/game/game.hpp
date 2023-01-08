@@ -6,14 +6,19 @@ namespace game
   class symbol
   {
    public:
-    symbol(const size_t dedi)
-        : dedi_(reinterpret_cast<T*>(dedi))
+    symbol(const size_t mp) noexcept
+        : mp_(reinterpret_cast<T*>(mp))
     {
     }
 
-    T* get() const
+    T* get() const noexcept
     {
-      return dedi_;
+      return mp_;
+    }
+
+    void set(const size_t mp) noexcept
+    {
+      this->mp_ = reinterpret_cast<T*>(mp);
     }
 
     operator T*() const
@@ -27,7 +32,7 @@ namespace game
     }
 
    private:
-    T* dedi_;
+    T* mp_;
   };
 
   constexpr std::size_t MAX_CLIENTS = 18;

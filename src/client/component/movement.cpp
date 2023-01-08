@@ -1,6 +1,6 @@
 #include <std_include.hpp>
 
-#include "../loader/component_loader.hpp"
+#include "loader/component_loader.hpp"
 #include <utils/hook.hpp>
 
 #include "command.hpp"
@@ -193,10 +193,8 @@ namespace movement
 
     static void register_dvars()
     {
-      bg_elevators = game::Dvar_RegisterBool("bg_elevators",
-                                             false,
-                                             game::CHEAT | game::CODINFO,
-                                             "Elevator glitch settings");
+      bg_elevators = game::Dvar_RegisterBool(
+          "bg_elevators", false, game::CHEAT | game::CODINFO, "CoD4 Elevators");
 
       bg_bouncesAllAngles =
           game::Dvar_RegisterBool("bg_bouncesAllAngles",

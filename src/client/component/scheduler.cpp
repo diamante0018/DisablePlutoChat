@@ -1,6 +1,6 @@
 #include <std_include.hpp>
 
-#include "../loader/component_loader.hpp"
+#include "loader/component_loader.hpp"
 
 #include <utils/concurrency.hpp>
 #include <utils/hook.hpp>

@@ -157,4 +157,9 @@ namespace game
 
   WEAK symbol<int> svs_clientCount{0x4B5CF8C};
   WEAK symbol<client_s> svs_clients{0x4B5CF90};
+
+  namespace plutonium
+  {
+    WEAK symbol<int(const char* fmt, ...)> printf{0};
+  } // namespace plutonium
 } // namespace game

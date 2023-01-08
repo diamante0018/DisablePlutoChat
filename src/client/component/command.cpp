@@ -1,5 +1,5 @@
 #include <std_include.hpp>
-#include "../loader/component_loader.hpp"
+#include "loader/component_loader.hpp"
 
 #include <utils/nt.hpp>
 #include <utils/string.hpp>
@@ -28,7 +28,8 @@ namespace command
 
       if (player->client == nullptr) return;
 
-      game::Cmd_Say_f(player, 0, 0, params.join(2).data());
+      const auto msg = params.join(2);
+      game::Cmd_Say_f(player, 0, 0, msg.data());
     }
   } // namespace
 
