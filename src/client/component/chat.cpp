@@ -20,8 +20,8 @@ namespace chat
     utils::named_mutex file_mutex{"mw3-mute-list-lock"};
 
     std::mutex access_mutex;
-    using mute = std::unordered_set<std::uint64_t>;
-    std::unordered_set<std::uint64_t> mute_list{};
+    using mute = std::unordered_set<std::string>;
+    mute mute_list{};
 
     game::dvar_t* sv_enableGameChat;
 
@@ -41,7 +41,7 @@ namespace chat
         values.SetObject();
 
         rapidjson::Value id;
-        id.SetUint64(entry);
+        id.SetString(entry.data(), mute_data.GetAllocator());
 
         values.AddMember("SteamID", id, mute_data.GetAllocator());
 
@@ -102,9 +102,9 @@ namespace chat
         }
 
         const auto& steam_id = entry["SteamID"];
-        if (steam_id.GetType() == rapidjson::Type::kNumberType)
+        if (steam_id.GetType() == rapidjson::Type::kStringType)
         {
-          list.insert(steam_id.GetUint64());
+          list.insert(steam_id.GetString());
         }
       }
     }
@@ -131,10 +131,8 @@ namespace chat
           return;
         }
 
-        const auto id = std::strtoull(guid, nullptr, 0);
-
         std::unique_lock _(access_mutex);
-        if (!sv_enableGameChat->current.enabled || mute_list.contains(id))
+        if (!sv_enableGameChat->current.enabled || mute_list.contains(guid))
         {
           game::Cbuf_InsertText(
               game::LOCAL_CLIENT_0,
@@ -157,6 +155,11 @@ namespace chat
 
       auto player_num = std::strtoul(params.get(1), nullptr, 10);
       player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
+      const auto* ent = &game::g_entities[player_num];
+      if (ent->client == nullptr)
+      {
+        return;
+      }
 
       const auto* guid = game::svs_clients[player_num].playerGuid;
       if (std::strstr(guid, "bot") != nullptr)
@@ -164,15 +167,15 @@ namespace chat
         return;
       }
 
-      const auto id = std::strtoull(guid, nullptr, 0);
+      printf("Muting %d: %s\n", player_num, guid);
 
       std::unique_lock _(access_mutex);
-      if (mute_list.contains(id))
+      if (mute_list.contains(guid))
       {
         return;
       }
 
-      mute_list.insert(id);
+      mute_list.insert(guid);
       save_mute_list(mute_list);
     }
 
@@ -185,6 +188,11 @@ namespace chat
 
       auto player_num = std::strtoul(params.get(1), nullptr, 10);
       player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
+      const auto* ent = &game::g_entities[player_num];
+      if (ent->client == nullptr)
+      {
+        return;
+      }
 
       const auto* guid = game::svs_clients[player_num].playerGuid;
       if (std::strstr(guid, "bot") != nullptr)
@@ -192,15 +200,16 @@ namespace chat
         return;
       }
 
-      const auto id = std::strtoull(guid, nullptr, 0);
+      printf("Unmuting %d: %s\n", player_num, guid);
+      const auto id = std::strtoull(guid, nullptr, 10);
 
       std::unique_lock _(access_mutex);
-      if (!mute_list.contains(id))
+      if (!mute_list.contains(guid))
       {
         return;
       }
 
-      mute_list.erase(id);
+      mute_list.erase(guid);
       save_mute_list(mute_list);
     }
   } // namespace
