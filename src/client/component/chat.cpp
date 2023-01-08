@@ -201,7 +201,6 @@ namespace chat
       }
 
       printf("Unmuting %d: %s\n", player_num, guid);
-      const auto id = std::strtoull(guid, nullptr, 10);
 
       std::unique_lock _(access_mutex);
       if (!mute_list.contains(guid))
