@@ -11,6 +11,7 @@
 #include <rapidjson/stringbuffer.h>
 
 #include "command.hpp"
+#include "scheduler.hpp"
 
 namespace chat
 {
@@ -168,7 +169,7 @@ namespace chat
         return;
       }
 
-      printf("Muting %d: %s\n", player_num, guid);
+      printf("Muting %u: %s\n", player_num, guid);
 
       std::unique_lock _(access_mutex);
       if (mute_list.contains(guid))
@@ -177,7 +178,12 @@ namespace chat
       }
 
       mute_list.insert(guid);
-      save_mute_list(mute_list);
+      scheduler::once(
+          [=]
+          {
+            save_mute_list(mute_list);
+          },
+          scheduler::pipeline::async);
     }
 
     void cmd_umute_player_f(const command::params& params)
@@ -202,7 +208,7 @@ namespace chat
         return;
       }
 
-      printf("Unmuting %d: %s\n", player_num, guid);
+      printf("Unmuting %u: %s\n", player_num, guid);
 
       std::unique_lock _(access_mutex);
       if (!mute_list.contains(guid))
@@ -211,7 +217,12 @@ namespace chat
       }
 
       mute_list.erase(guid);
-      save_mute_list(mute_list);
+      scheduler::once(
+          [=]
+          {
+            save_mute_list(mute_list);
+          },
+          scheduler::pipeline::async);
     }
   } // namespace
 

@@ -136,7 +136,7 @@ namespace scheduler
             const std::chrono::milliseconds delay)
   {
     schedule(
-        [callback]()
+        [callback]
         {
           callback();
           return cond_continue;
@@ -149,7 +149,7 @@ namespace scheduler
             const std::chrono::milliseconds delay)
   {
     schedule(
-        [callback]()
+        [callback]
         {
           callback();
           return cond_end;
