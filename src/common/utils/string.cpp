@@ -74,12 +74,12 @@ namespace utils::string
 
   bool is_number(const std::string& text)
   {
-    return !str.empty() && std::find_if(str.begin(),
-                                        str.end(),
-                                        [](unsigned char input)
-                                        {
-                                          return !std::isdigit(input);
-                                        }) == str.end();
+    return !text.empty() && std::find_if(text.begin(),
+                                         text.end(),
+                                         [](unsigned char input)
+                                         {
+                                           return !std::isdigit(input);
+                                         }) == text.end();
   }
 
   std::string dump_hex(const std::string& data, const std::string& separator)

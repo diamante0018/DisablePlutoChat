@@ -27,7 +27,7 @@ namespace reserved
     utils::concurrency::container<reserved_list_container> reserved_list;
 
     // Have only one instance of IW4x read/write the file
-    std::unique_lock<utils::named_mutex> Lock()
+    std::unique_lock<utils::named_mutex> lock()
     {
       static utils::named_mutex mutex{"iw5-reserved-list-lock"};
       std::unique_lock lock{mutex};
@@ -39,7 +39,7 @@ namespace reserved
       rapidjson::Document default_doc{};
       default_doc.SetObject();
 
-      const auto _ = Lock();
+      const auto _ = lock();
 
       auto data = utils::io::read_file(reserved_list_file);
       if (data.empty())
@@ -113,12 +113,14 @@ namespace reserved
 
     void save_reserved_list()
     {
-      const auto _ = Lock();
+      const auto _ = lock();
 
       rapidjson::Document list_document;
       list_document.SetObject();
 
       list_document.AddMember("Reason", reason, list_document.GetAllocator());
+      list_document.AddMember(
+          "Limit", max_reserved_count, list_document.GetAllocator());
 
       rapidjson::Value guid_entries(rapidjson::kArrayType);
       auto copy_list = reserved_list.access<reserved_list_container>(
