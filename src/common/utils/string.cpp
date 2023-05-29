@@ -72,7 +72,7 @@ namespace utils::string
     return std::equal(substring.rbegin(), substring.rend(), text.rbegin());
   }
 
-  bool is_number(const std::string& str)
+  bool is_number(const std::string& text)
   {
     return !str.empty() && std::find_if(str.begin(),
                                         str.end(),
