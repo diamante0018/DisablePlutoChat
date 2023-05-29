@@ -23,11 +23,14 @@ namespace game
   {
     LOCAL_CLIENT_INVALID = -1,
     LOCAL_CLIENT_0 = 0x0,
-    LOCAL_CLIENT_1 = 0x1,
-    LOCAL_CLIENT_2 = 0x2,
-    LOCAL_CLIENT_3 = 0x3,
-    LOCAL_CLIENT_LAST = 0x3,
-    LOCAL_CLIENT_COUNT = 0x4,
+    LOCAL_CLIENT_LAST = 0x0,
+    LOCAL_CLIENT_COUNT = 0x1,
+  };
+
+  enum svscmd_type
+  {
+    SV_CMD_CAN_IGNORE = 0x0,
+    SV_CMD_RELIABLE = 0x1,
   };
 
   struct StringTableCell

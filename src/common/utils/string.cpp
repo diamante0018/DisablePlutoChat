@@ -72,6 +72,16 @@ namespace utils::string
     return std::equal(substring.rbegin(), substring.rend(), text.rbegin());
   }
 
+  bool is_number(const std::string& str)
+  {
+    return !str.empty() && std::find_if(str.begin(),
+                                        str.end(),
+                                        [](unsigned char input)
+                                        {
+                                          return !std::isdigit(input);
+                                        }) == str.end();
+  }
+
   std::string dump_hex(const std::string& data, const std::string& separator)
   {
     std::string result;
@@ -146,7 +156,7 @@ namespace utils::string
       return str;
     }
 
-    size_t start_pos = 0;
+    std::size_t start_pos = 0;
     while ((start_pos = str.find(from, start_pos)) != std::string::npos)
     {
       str.replace(start_pos, from.length(), to);

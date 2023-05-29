@@ -46,8 +46,13 @@ namespace game
   WEAK symbol<void(int localClientNum, int a2, const char* message, int a4,
                    int a5, int a6)>
       Client_Print{0x487B00};
-  WEAK symbol<void(const char* cmdName, void(), cmd_function_t* cmd)>
+  WEAK symbol<void(const char* cmdName, void(*function),
+                   cmd_function_t* allocedCmd)>
       Cmd_AddCommandInternal{0x545DF0};
+  WEAK symbol<void(const char* cmdName, void(*function),
+                   cmd_function_t* allocedCmd)>
+      Cmd_AddServerCommandInternal{0x545800};
+  WEAK symbol<void()> Cbuf_AddServerText_f{0x71D130};
   WEAK symbol<void(const char* cmdName)> Cmd_RemoveCommand{0x545E20};
   WEAK symbol<const char*(int index)> Cmd_Argv{0x467600};
   WEAK symbol<void()> SV_DisconnectAllClients{0x05749E0};
@@ -160,6 +165,6 @@ namespace game
 
   namespace plutonium
   {
-    WEAK symbol<int(const char* fmt, ...)> printf{0};
+    WEAK symbol<int(const char* fmt, ...)> printf{0x0};
   } // namespace plutonium
 } // namespace game

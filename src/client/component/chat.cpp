@@ -115,7 +115,7 @@ namespace chat
       char cmd[1024]{};
       const auto* ent = &game::g_entities[client_num];
 
-      if (ent->client == nullptr)
+      if (!ent->client)
       {
         // Not fully in game yet
         return;
@@ -147,8 +147,15 @@ namespace chat
       client_command_hook.invoke<void>(client_num);
     }
 
-    void cmd_mute_player_f(const command::params& params)
+    void cmd_mute_player_f(const command::params_sv& params)
     {
+      auto* com_sv_running = game::Dvar_FindVar("sv_running");
+      if (!com_sv_running->current.enabled)
+      {
+        printf("Server is not running.\n");
+        return;
+      }
+
       if (params.size() < 2)
       {
         printf("Usage: %s <client num>", params[0]);
@@ -186,8 +193,15 @@ namespace chat
           scheduler::pipeline::async);
     }
 
-    void cmd_umute_player_f(const command::params& params)
+    void cmd_umute_player_f(const command::params_sv& params)
     {
+      auto* com_sv_running = game::Dvar_FindVar("sv_running");
+      if (!com_sv_running->current.enabled)
+      {
+        printf("Server is not running.\n");
+        return;
+      }
+
       if (params.size() < 2)
       {
         printf("Usage: %s <client num>", params[0]);
@@ -244,8 +258,8 @@ namespace chat
    private:
     static void add_chat_commands()
     {
-      command::add("mutePlayer", cmd_mute_player_f);
-      command::add("unmutePlayer", cmd_umute_player_f);
+      command::add_sv("mutePlayer", cmd_mute_player_f);
+      command::add_sv("unmutePlayer", cmd_umute_player_f);
     }
   };
 } // namespace chat

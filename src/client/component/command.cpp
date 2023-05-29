@@ -1,5 +1,4 @@
 #include <std_include.hpp>
-#include "loader/component_loader.hpp"
 
 #include <utils/nt.hpp>
 #include <utils/string.hpp>
@@ -12,36 +11,33 @@ namespace command
 {
   namespace
   {
-    std::unordered_map<std::string, std::function<void(params&)>> handlers;
-
-    void cmd_say_as_player_f(const params& params)
-    {
-      if (params.size() < 3)
-      {
-        return;
-      }
-
-      auto player_num = std::strtoul(params.get(1), nullptr, 10);
-      player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
-
-      auto* const player = &game::g_entities[player_num];
-
-      if (player->client == nullptr) return;
-
-      const auto msg = params.join(2);
-      game::Cmd_Say_f(player, 0, 0, msg.data());
-    }
+    std::unordered_map<std::string, std::function<void(const params&)>>
+        handlers;
+    std::unordered_map<std::string, std::function<void(const params_sv&)>>
+        handlers_sv;
   } // namespace
 
   void main_handler()
   {
-    params params = {};
+    params params;
 
     const auto command = utils::string::to_lower(params[0]);
 
-    if (const auto got = handlers.find(command); got != handlers.end())
+    if (const auto itr = handlers.find(command); itr != handlers.end())
     {
-      got->second(params);
+      itr->second(params);
+    }
+  }
+
+  void main_handler_sv()
+  {
+    params_sv params;
+
+    const auto command = utils::string::to_lower(params[0]);
+
+    if (const auto itr = handlers_sv.find(command); itr != handlers_sv.end())
+    {
+      itr->second(params);
     }
   }
 
@@ -68,13 +64,56 @@ namespace command
 
   std::string params::join(const int index) const
   {
-    std::string result = {};
+    std::string result;
 
     for (auto i = index; i < this->size(); i++)
     {
-      if (i > index) result.append(" ");
+      if (i > index)
+      {
+        result.push_back(' ');
+      }
+
       result.append(this->get(i));
     }
+
+    return result;
+  }
+
+  params_sv::params_sv()
+      : nesting_(game::sv_cmd_args->nesting)
+  {
+    assert(game::sv_cmd_args->nesting < CMD_MAX_NESTING);
+  }
+
+  int params_sv::size() const
+  {
+    return game::sv_cmd_args->argc[this->nesting_];
+  }
+
+  const char* params_sv::get(const int index) const
+  {
+    if (index >= this->size())
+    {
+      return "";
+    }
+
+    return game::sv_cmd_args->argv[this->nesting_][index];
+  }
+
+  std::string params_sv::join(const int index) const
+  {
+    std::string result;
+
+    for (auto i = index; i < this->size(); i++)
+    {
+      if (i > index)
+      {
+        result.push_back(' ');
+      }
+
+      result.append(this->get(i));
+    }
+
     return result;
   }
 
@@ -84,6 +123,16 @@ namespace command
         name,
         callback,
         utils::memory::get_allocator()->allocate<game::cmd_function_t>());
+  }
+
+  void add_raw_sv(const char* name, void (*callback)())
+  {
+    game::Cmd_AddServerCommandInternal(
+        name,
+        callback,
+        utils::memory::get_allocator()->allocate<game::cmd_function_t>());
+
+    add_raw(name, game::Cbuf_AddServerText_f);
   }
 
   void add(const char* name, const std::function<void(const params&)>& callback)
@@ -98,6 +147,19 @@ namespace command
     handlers[command] = callback;
   }
 
+  void add_sv(const char* name,
+              const std::function<void(const params_sv&)>& callback)
+  {
+    const auto command = utils::string::to_lower(name);
+
+    if (!handlers_sv.contains(command))
+    {
+      add_raw_sv(name, main_handler_sv);
+    }
+
+    handlers_sv[command] = callback;
+  }
+
   void add(const char* name, const std::function<void()>& callback)
   {
     add(name,
@@ -106,21 +168,4 @@ namespace command
           callback();
         });
   }
-
-  class component final : public component_interface
-  {
-   public:
-    void post_unpack() override
-    {
-      add_commands_generic();
-    }
-
-   private:
-    static void add_commands_generic()
-    {
-      add("sayAsPlayer", cmd_say_as_player_f);
-    }
-  };
 } // namespace command
-
-REGISTER_COMPONENT(command::component)

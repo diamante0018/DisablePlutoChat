@@ -95,6 +95,7 @@ namespace utils::string
 
   bool starts_with(const std::string& text, const std::string& substring);
   bool ends_with(const std::string& text, const std::string& substring);
+  bool is_number(const std::string& str);
 
   std::string dump_hex(const std::string& data,
                        const std::string& separator = " ");
