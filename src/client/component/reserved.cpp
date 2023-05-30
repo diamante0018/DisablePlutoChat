@@ -355,10 +355,7 @@ namespace reserved
         for (auto i = 0; i < *game::svs_clientCount; ++i)
         {
           auto* client = &game::svs_clients[i];
-          if (client->state == game::CS_FREE)
-          {
-            continue;
-          }
+          assert(client->state);
 
           if (is_test_client(client))
           {
@@ -385,10 +382,7 @@ namespace reserved
           for (auto i = 0; i < *game::svs_clientCount; ++i)
           {
             auto* client = &game::svs_clients[i];
-            if (client->state == game::CS_FREE)
-            {
-              continue;
-            }
+            assert(client->state);
 
             is_reserved = is_client_reserved(client->playerGuid);
 

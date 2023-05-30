@@ -6,10 +6,11 @@
 
 #include <Windows.h>
 
-#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstring>
+
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <map>
