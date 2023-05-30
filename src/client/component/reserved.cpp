@@ -369,13 +369,14 @@ namespace reserved
       // If the server is still full
       if (is_server_full())
       {
+        // Check if the user that is trying to connect is a VIP
         const auto* value = game::Info_ValueForKey(s, "xuid");
         auto is_reserved = is_client_reserved(value);
 
         if (is_reserved)
         {
-          // Check if there are any non-VIPs we can kick or if there are too
-          // many VIPs
+          // Check if there are any non-VIPs
+          // We can kick or if there are too many VIPs
           // If there are too many VIPs we do nothing
 
           std::size_t count = 0;
@@ -397,8 +398,8 @@ namespace reserved
             }
 
             // This is the first non-VIP client we found in a full server. That
-            // means the client will get kicked The count of VIPs already on the
-            // server is also less than max_reserved_count
+            // means the client will get kicked. The count of VIPs already on
+            // the server is also less than max_reserved_count
             if (!is_reserved)
             {
               game::SV_DropClientInternal(client, reason.data(), true);
