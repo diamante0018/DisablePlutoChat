@@ -23,7 +23,7 @@ namespace reserved
     std::string reason;
     std::size_t max_reserved_count; // Limit VIPs per server
 
-    using reserved_list_container = std::unordered_set<std::uint64_t>;
+    using reserved_list_container = std::unordered_set<std::string>;
     utils::concurrency::container<reserved_list_container> reserved_list;
 
     // Have only one instance of IW5 read/write the file
@@ -122,9 +122,9 @@ namespace reserved
           {
             for (const auto& entry : member_list.GetArray())
             {
-              if (entry.IsUint64())
+              if (entry.IsString())
               {
-                list.insert(entry.GetUint64());
+                list.insert(entry.GetString());
               }
             }
           });
@@ -153,7 +153,7 @@ namespace reserved
       for (const auto& entry : copy_list)
       {
         rapidjson::Value guid;
-        guid.SetUint64(entry);
+        guid.SetString(entry.data(), list_document.GetAllocator());
 
         guid_entries.PushBack(guid, list_document.GetAllocator());
       }
@@ -184,23 +184,10 @@ namespace reserved
 
     void reserve_client(const game::client_s* client)
     {
-      std::uint64_t guid;
-      try
-      {
-        guid = std::stoull(client->playerGuid, nullptr, 16);
-      }
-      catch (const std::exception& ex)
-      {
-        printf("%s: Invalid client guid \"%s\", how could this happen?\n",
-               ex.what(),
-               client->playerGuid);
-        return;
-      }
-
       reserved_list.access(
-          [&guid](reserved_list_container& list)
+          [&client](reserved_list_container& list)
           {
-            list.insert(guid);
+            list.insert(client->playerGuid);
           });
 
       scheduler::once(save_reserved_list, scheduler::pipeline::async);
@@ -212,7 +199,7 @@ namespace reserved
           utils::string::va("%c \"You were given VIP\"", 0x65));
     }
 
-    void reserve_client(const std::uint64_t guid)
+    void reserve_client(const std::string& guid)
     {
       reserved_list.access(
           [&guid](reserved_list_container& list)
@@ -220,7 +207,7 @@ namespace reserved
             list.insert(guid);
           });
 
-      printf("0x%llx was given VIP\n", guid);
+      printf("%s was given VIP\n", guid.data());
       scheduler::once(save_reserved_list, scheduler::pipeline::async);
     }
 
@@ -317,20 +304,7 @@ namespace reserved
               return;
             }
 
-            std::uint64_t guid;
-            try
-            {
-              guid = std::stoull(params.get(1), nullptr, 16);
-            }
-            catch (const std::exception& ex)
-            {
-              printf("%s: Invalid client guid \"%s\", how could this happen?\n",
-                     ex.what(),
-                     params.get(1));
-              return;
-            }
-
-            reserve_client(guid);
+            reserve_client(params.get(1));
           });
     }
 
@@ -351,18 +325,11 @@ namespace reserved
       return i == *game::svs_clientCount;
     }
 
-    bool is_client_reserved(const char* xuid)
+    bool is_client_reserved(const char* guid)
     {
-      std::uint64_t guid;
-      try
+      assert(guid);
+      if (!guid)
       {
-        guid = std::stoull(xuid, nullptr, 16);
-      }
-      catch (const std::exception& ex)
-      {
-        printf("%s: Invalid client guid \"%s\", how could this happen?\n",
-               ex.what(),
-               xuid);
         return false;
       }
 

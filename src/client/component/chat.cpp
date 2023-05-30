@@ -48,10 +48,10 @@ namespace chat
         rapidjson::Value values;
         values.SetObject();
 
-        rapidjson::Value id;
-        id.SetString(entry.data(), mute_data.GetAllocator());
+        rapidjson::Value guid;
+        guid.SetString(entry.data(), mute_data.GetAllocator());
 
-        values.AddMember("SteamID", id, mute_data.GetAllocator());
+        values.AddMember("SteamID", guid, mute_data.GetAllocator());
 
         mute_entries.PushBack(values, mute_data.GetAllocator());
       }
@@ -109,12 +109,11 @@ namespace chat
 
       if (!mute_data.HasMember("MutedPlayers"))
       {
-        printf("Mute list file seems to be empty\n");
+        printf("%s file seems to be empty\n", mute_list_file);
         return;
       }
 
       const rapidjson::Value& loaded_mute_list = mute_data["MutedPlayers"];
-
       if (!loaded_mute_list.IsArray() || loaded_mute_list.Empty())
       {
         return;
@@ -210,12 +209,7 @@ namespace chat
       }
 
       mute_list.insert(guid);
-      scheduler::once(
-          [=]
-          {
-            save_mute_list(mute_list);
-          },
-          scheduler::pipeline::async);
+      save_mute_list(mute_list);
     }
 
     void cmd_umute_player_f(const command::params_sv& params)
@@ -256,12 +250,7 @@ namespace chat
       }
 
       mute_list.erase(guid);
-      scheduler::once(
-          [=]
-          {
-            save_mute_list(mute_list);
-          },
-          scheduler::pipeline::async);
+      save_mute_list(mute_list);
     }
   } // namespace
 
