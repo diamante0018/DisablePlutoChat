@@ -26,7 +26,7 @@ namespace reserved
     using reserved_list_container = std::unordered_set<std::uint64_t>;
     utils::concurrency::container<reserved_list_container> reserved_list;
 
-    // Have only one instance of IW4x read/write the file
+    // Have only one instance of IW5 read/write the file
     std::unique_lock<utils::named_mutex> lock()
     {
       static utils::named_mutex mutex{"iw5-reserved-list-lock"};
@@ -233,7 +233,7 @@ namespace reserved
       }
 
       auto* client = &game::svs_clients[idnum];
-      if (!client->state)
+      if (client->state == game::CS_FREE)
       {
         printf("Client %i is not active\n", idnum);
         return nullptr;
@@ -244,6 +244,11 @@ namespace reserved
 
     bool is_test_client(const game::client_s* client)
     {
+      if (client->state == game::CS_FREE)
+      {
+        return false;
+      }
+
       const auto* guid = client->playerGuid;
       return std::strstr(guid, "bot") != nullptr;
     }
@@ -350,6 +355,11 @@ namespace reserved
         for (auto i = 0; i < *game::svs_clientCount; ++i)
         {
           auto* client = &game::svs_clients[i];
+          if (client->state == game::CS_FREE)
+          {
+            continue;
+          }
+
           if (is_test_client(client))
           {
             game::SV_DropClientInternal(client, "EXE_DISCONNECTED", true);
@@ -375,6 +385,11 @@ namespace reserved
           for (auto i = 0; i < *game::svs_clientCount; ++i)
           {
             auto* client = &game::svs_clients[i];
+            if (client->state == game::CS_FREE)
+            {
+              continue;
+            }
+
             is_reserved = is_client_reserved(client->playerGuid);
 
             if (is_reserved)
