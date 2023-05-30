@@ -2,7 +2,6 @@
 #include "loader/component_loader.hpp"
 
 #include <utils/hook.hpp>
-#include <utils/nt.hpp>
 
 BOOL APIENTRY DllMain(HMODULE /*hModule*/, DWORD ul_reason_for_call,
                       LPVOID /*lpReserved*/
