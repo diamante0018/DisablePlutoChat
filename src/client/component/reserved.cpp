@@ -434,6 +434,8 @@ namespace reserved
       reason = "EXE_DISCONNECTED"s;
       max_reserved_count = game::MAX_CLIENTS;
       utils::hook::call(0x572E60, info_value_for_key_stub);
+
+      scheduler::once(add_reserved_commands, scheduler::pipeline::main);
     }
   };
 } // namespace reserved

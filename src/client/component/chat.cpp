@@ -247,7 +247,7 @@ namespace chat
     {
       client_command_hook.create(0x502CB0, &client_command_stub);
 
-      add_chat_commands();
+      scheduler::once(add_chat_commands, scheduler::pipeline::main);
 
       sv_enableGameChat = game::Dvar_RegisterBool(
           "sv_enableGameChat", true, game::NONE, "Enable game chat");

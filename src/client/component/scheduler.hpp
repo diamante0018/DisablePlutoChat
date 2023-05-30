@@ -4,6 +4,7 @@ namespace scheduler
 {
   enum pipeline
   {
+    main,
     server,
     async,
     count,

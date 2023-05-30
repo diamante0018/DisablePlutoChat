@@ -107,6 +107,12 @@ namespace scheduler
       pipelines[type].execute();
     }
 
+    void db_update_stub()
+    {
+      reinterpret_cast<void (*)()>(0x4CDA40)();
+      execute(pipeline::main);
+    }
+
     void server_frame_stub()
     {
       reinterpret_cast<void (*)()>(0x50C1E0)();
@@ -173,6 +179,8 @@ namespace scheduler
               std::this_thread::sleep_for(10ms);
             }
           });
+
+      utils::hook::call(0x556889, db_update_stub);
 
       utils::hook::call(0x50CEDC, server_frame_stub);
     }
