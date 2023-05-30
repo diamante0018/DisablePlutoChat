@@ -106,8 +106,6 @@ targetname "pluto-disable-chat"
 pchheader "std_include.hpp"
 pchsource "src/client/std_include.cpp"
 
-linkoptions {"/IGNORE:4254", "/PDBCompress"}
-
 files {"./src/client/**.hpp", "./src/client/**.cpp"}
 
 includedirs {"./src/client", "./src/common", "%{prj.location}/src"}
