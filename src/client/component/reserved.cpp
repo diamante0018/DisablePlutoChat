@@ -388,7 +388,7 @@ namespace reserved
       if (is_server_full())
       {
         // Limit this patch according to the settings
-        if (get_reserved_count() == max_reserved_count)
+        if (get_reserved_count() >= max_reserved_count)
         {
           return game::Info_ValueForKey(s, key);
         }
