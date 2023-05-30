@@ -347,6 +347,24 @@ namespace reserved
           });
     }
 
+    std::size_t get_reserved_count()
+    {
+      std::size_t count = 0;
+      for (auto i = 0; i < *game::svs_clientCount; ++i)
+      {
+        auto* client = &game::svs_clients[i];
+        assert(client->state);
+
+        const auto is_reserved = is_client_reserved(client->playerGuid);
+        if (is_reserved)
+        {
+          ++count;
+        }
+      }
+
+      return count;
+    }
+
     const char* info_value_for_key_stub(const char* s, const char* key)
     {
       if (is_server_full())
@@ -369,33 +387,27 @@ namespace reserved
       // If the server is still full
       if (is_server_full())
       {
+        // Limit this patch according to the settings
+        if (get_reserved_count() == max_reserved_count)
+        {
+          return game::Info_ValueForKey(s, key);
+        }
+
         // Check if the user that is trying to connect is a VIP
         const auto* value = game::Info_ValueForKey(s, "xuid");
         auto is_reserved = is_client_reserved(value);
-
         if (is_reserved)
         {
           // Check if there are any non-VIPs
           // We can kick or if there are too many VIPs
           // If there are too many VIPs we do nothing
 
-          std::size_t count = 0;
           for (auto i = 0; i < *game::svs_clientCount; ++i)
           {
             auto* client = &game::svs_clients[i];
             assert(client->state);
 
             is_reserved = is_client_reserved(client->playerGuid);
-
-            if (is_reserved)
-            {
-              ++count;
-            }
-
-            if (count == max_reserved_count)
-            {
-              break;
-            }
 
             // This is the first non-VIP client we found in a full server. That
             // means the client will get kicked. The count of VIPs already on
