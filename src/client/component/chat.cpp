@@ -17,7 +17,8 @@ namespace chat
 {
   namespace
   {
-    const auto* file_path = "admin/mute.json";
+    const char* mute_list_file = "mute.json";
+
     utils::named_mutex file_mutex{"mw3-mute-list-lock"};
 
     std::mutex access_mutex;
@@ -27,6 +28,12 @@ namespace chat
     game::dvar_t* sv_enableGameChat;
 
     utils::hook::detour client_command_hook;
+
+    std::filesystem::path get_file_path()
+    {
+      std::filesystem::path root = "admin";
+      return root / mute_list_file;
+    }
 
     void save_mute_list(const mute& list)
     {
@@ -58,27 +65,45 @@ namespace chat
                         rapidjson::ASCII<>>
           writer(buffer);
       mute_data.Accept(writer);
-
-      utils::io::write_file(file_path, buffer.GetString());
+#ifdef _DEBUG
+      printf("Saving \"%s\" to \"%s\"\n",
+             mute_list_file,
+             get_file_path().string().data());
+#endif
+      utils::io::write_file(
+          get_file_path().string(),
+          std::string{buffer.GetString(), buffer.GetLength()});
     }
 
     void load_mute_list(mute& list)
     {
       std::unique_lock _{file_mutex};
 
-      if (!utils::io::file_exists(file_path))
+      if (!utils::io::file_exists(get_file_path().string()))
       {
-        printf("Mute list file does not exist\n");
+        printf("%s file does not exist\n", mute_list_file);
         return;
       }
 
+      auto data = utils::io::read_file(get_file_path().string());
+      if (data.empty())
+      {
+        printf("%s is empty\n", mute_list_file);
+        return;
+      }
+
+#ifdef _DEBUG
+      printf("Loading \"%s\" from \"%s\"\n",
+             mute_list_file,
+             get_file_path().string().data());
+#endif
+
       rapidjson::Document mute_data;
-      const rapidjson::ParseResult result =
-          mute_data.Parse(utils::io::read_file(file_path).data());
+      const rapidjson::ParseResult result = mute_data.Parse(data);
 
       if (!result || !mute_data.IsObject())
       {
-        printf("Failed to parse mute list file. Empty?\n");
+        printf("Failed to parse \"%s\" file. Empty?\n", mute_list_file);
         return;
       }
 
@@ -165,7 +190,7 @@ namespace chat
       auto player_num = std::strtoul(params.get(1), nullptr, 10);
       player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
       const auto* ent = &game::g_entities[player_num];
-      if (ent->client == nullptr)
+      if (!ent->client)
       {
         return;
       }
@@ -211,7 +236,7 @@ namespace chat
       auto player_num = std::strtoul(params.get(1), nullptr, 10);
       player_num = std::min<std::uint32_t>(player_num, game::MAX_CLIENTS - 1);
       const auto* ent = &game::g_entities[player_num];
-      if (ent->client == nullptr)
+      if (!ent->client)
       {
         return;
       }

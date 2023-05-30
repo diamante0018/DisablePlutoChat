@@ -34,6 +34,12 @@ namespace reserved
       return lock;
     }
 
+    std::filesystem::path get_file_path()
+    {
+      std::filesystem::path root = "admin";
+      return root / reserved_list_file;
+    }
+
     rapidjson::Document parse_reserved_list()
     {
       rapidjson::Document default_doc{};
@@ -41,12 +47,24 @@ namespace reserved
 
       const auto _ = lock();
 
-      auto data = utils::io::read_file(reserved_list_file);
-      if (data.empty())
+      if (!utils::io::file_exists(get_file_path().string()))
       {
-        printf("reserved-users.json does not exist\n");
+        printf("%s list file does not exist\n", reserved_list_file);
         return default_doc;
       }
+
+      auto data = utils::io::read_file(get_file_path().string());
+      if (data.empty())
+      {
+        printf("%s is empty\n", reserved_list_file);
+        return default_doc;
+      }
+
+#ifdef _DEBUG
+      printf("Loading \"%s\" from \"%s\"\n",
+             reserved_list_file,
+             get_file_path().string().data());
+#endif
 
       rapidjson::Document doc{};
       const rapidjson::ParseResult result = doc.Parse(data);
@@ -64,9 +82,9 @@ namespace reserved
       const auto list_document = parse_reserved_list();
       if (!list_document.HasMember("Reason"))
       {
-        printf(
-            "reserved-users.json does not contain JSON member \"Reason\". Defaulting to %s\n",
-            reason.data());
+        printf("%s does not contain JSON member \"Reason\". Defaulting to %s\n",
+               reserved_list_file,
+               reason.data());
       }
       else if (list_document["Reason"].IsString())
       {
@@ -75,9 +93,9 @@ namespace reserved
 
       if (!list_document.HasMember("Limit"))
       {
-        printf(
-            "reserved-users.json does not contain JSON member \"Limit\". Defaulting to %zu\n",
-            max_reserved_count);
+        printf("%s does not contain JSON member \"Limit\". Defaulting to %zu\n",
+               reserved_list_file,
+               max_reserved_count);
       }
       else if (list_document["Limit"].IsUint())
       {
@@ -88,7 +106,8 @@ namespace reserved
       if (!list_document.HasMember("GUID"))
       {
         printf(
-            "reserved-users.json does not contain JSON member \"GUID\". No user will be considered privileged\n");
+            "%s does not contain JSON member \"GUID\". No user will be considered privileged\n",
+            reserved_list_file);
         return;
       }
 
@@ -150,10 +169,17 @@ namespace reserved
       list_document.Accept(writer);
 
       utils::io::write_file(
-          reserved_list_file,
+          get_file_path().string(),
           std::string{buffer.GetString(), buffer.GetLength()});
 
-      printf("Saved %zu users IDs to reserved-users.json\n", copy_list.size());
+#ifdef _DEBUG
+      printf("Saving \"%s\" to \"%s\"\n",
+             reserved_list_file,
+             get_file_path().string().data());
+#endif
+
+      printf(
+          "Saved %zu users IDs to %s\n", copy_list.size(), reserved_list_file);
     }
 
     void reserve_client(const game::client_s* client)
