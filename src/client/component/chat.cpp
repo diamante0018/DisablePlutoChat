@@ -191,6 +191,7 @@ namespace chat
       const auto* ent = &game::g_entities[player_num];
       if (!ent->client)
       {
+        printf("Client %i is not active\n", player_num);
         return;
       }
 
