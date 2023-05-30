@@ -80,9 +80,15 @@ namespace utils::nt
          ++i, ++section)
     {
       if (section)
+      {
         headers.push_back(section);
+      }
       else
+      {
+#ifdef _DEBUG
         OutputDebugStringA("There was an invalid section :O");
+#endif
+      }
     }
 
     return headers;

@@ -144,6 +144,9 @@ namespace game
 
   WEAK symbol<void*(int, const char*, int)> DB_FindXAssetHeader{0x4CA620};
 
+  WEAK symbol<FILE*()> __iob_func{0x739462};
+  WEAK symbol<int(FILE* stream, const char* format, ...)> _fprintf{0x738E95};
+
   // Variables
   WEAK symbol<CmdArgs> cmd_args{0x1C978D0};
   WEAK symbol<CmdArgs> sv_cmd_args{0x1CAA998};
@@ -162,9 +165,4 @@ namespace game
 
   WEAK symbol<int> svs_clientCount{0x4B5CF8C};
   WEAK symbol<client_s> svs_clients{0x4B5CF90};
-
-  namespace plutonium
-  {
-    WEAK symbol<int(const char* fmt, ...)> printf{0x0};
-  } // namespace plutonium
 } // namespace game

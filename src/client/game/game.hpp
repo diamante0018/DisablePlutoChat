@@ -6,7 +6,7 @@ namespace game
   class symbol
   {
    public:
-    symbol(const size_t mp) noexcept
+    symbol(const std::size_t mp) noexcept
         : mp_(reinterpret_cast<T*>(mp))
     {
     }
@@ -16,7 +16,7 @@ namespace game
       return mp_;
     }
 
-    void set(const size_t mp) noexcept
+    void set(const std::size_t mp) noexcept
     {
       this->mp_ = reinterpret_cast<T*>(mp);
     }
@@ -37,5 +37,12 @@ namespace game
 
   constexpr std::size_t MAX_CLIENTS = 18;
 } // namespace game
+
+#define _stdin_index 0
+#define _printf(format, ...)                                 \
+  {                                                          \
+    auto* _stdin_file = &(game::__iob_func()[_stdin_index]); \
+    game::_fprintf(_stdin_file, format, ##__VA_ARGS__);      \
+  }
 
 #include "symbols.hpp"
