@@ -9,7 +9,7 @@ namespace utils::nt
 
   library library::load(const std::filesystem::path& path)
   {
-    return library::load(path.generic_string());
+    return load(path.generic_string());
   }
 
   library library::get_by_address(void* address)
@@ -141,7 +141,7 @@ namespace utils::nt
 
   std::string library::get_path() const
   {
-    if (!this->is_valid()) return "";
+    if (!this->is_valid()) return {};
 
     char name[MAX_PATH] = {0};
     GetModuleFileNameA(this->module_, name, sizeof name);
@@ -151,7 +151,7 @@ namespace utils::nt
 
   std::string library::get_folder() const
   {
-    if (!this->is_valid()) return "";
+    if (!this->is_valid()) return {};
 
     const auto path = std::filesystem::path(this->get_path());
     return path.parent_path().generic_string();

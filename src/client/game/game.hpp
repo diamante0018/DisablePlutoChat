@@ -2,6 +2,9 @@
 
 namespace game
 {
+  [[nodiscard]] std::size_t get_base();
+  [[nodiscard]] bool is_plutonium();
+
   template <typename T>
   class symbol
   {
