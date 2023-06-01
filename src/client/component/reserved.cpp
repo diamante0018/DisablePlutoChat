@@ -82,6 +82,7 @@ namespace reserved
       const auto list_document = parse_reserved_list();
       if (!list_document.HasMember("Reason"))
       {
+        reason = "EXE_DISCONNECTED"s;
         printf("%s does not contain JSON member \"Reason\". Defaulting to %s\n",
                reserved_list_file,
                reason.data());
@@ -93,6 +94,7 @@ namespace reserved
 
       if (!list_document.HasMember("Limit"))
       {
+        max_reserved_count = game::MAX_CLIENTS;
         printf("%s does not contain JSON member \"Limit\". Defaulting to %zu\n",
                reserved_list_file,
                max_reserved_count);
@@ -424,10 +426,9 @@ namespace reserved
    public:
     void post_unpack() override
     {
-      reason = "EXE_DISCONNECTED"s;
-      max_reserved_count = game::MAX_CLIENTS;
       utils::hook::call(0x572E60, info_value_for_key_stub);
 
+      scheduler::once(load_reserved_list, scheduler::pipeline::async);
       scheduler::once(add_reserved_commands, scheduler::pipeline::main);
     }
   };
