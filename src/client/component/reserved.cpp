@@ -209,7 +209,19 @@ namespace reserved
             list.insert(guid);
           });
 
-      printf("%s was given VIP\n", guid.data());
+      printf("%s is a VIP\n", guid.data());
+      scheduler::once(save_reserved_list, scheduler::pipeline::async);
+    }
+
+    void remove_reserved_client(const std::string& guid)
+    {
+      reserved_list.access(
+          [&guid](reserved_list_container& list)
+          {
+            list.erase(guid);
+          });
+
+      printf("%s is no longer a VIP\n", guid.data());
       scheduler::once(save_reserved_list, scheduler::pipeline::async);
     }
 
@@ -241,7 +253,7 @@ namespace reserved
       }
 
       auto idnum = std::atoi(s);
-      if (idnum < 0 || idnum >= game::MAX_CLIENTS)
+      if (idnum < 0 || static_cast<std::size_t>(idnum) >= game::MAX_CLIENTS)
       {
         printf("Bad client slot: %i\n", idnum);
         return nullptr;
@@ -284,7 +296,9 @@ namespace reserved
             const auto* cmd = params.get(0);
             if (params.size() < 2)
             {
-              printf("Usage: %s <client number> : reserve this client\n", cmd);
+              printf(
+                  "Usage: %s <client number> : reserve the specified client\n",
+                  cmd);
               return;
             }
 
@@ -307,6 +321,35 @@ namespace reserved
             }
 
             reserve_client(params.get(1));
+          });
+
+      command::add_sv(
+          "removeReservedClient",
+          [](const command::params_sv& params)
+          {
+            auto* com_sv_running = game::Dvar_FindVar("sv_running");
+            if (!com_sv_running->current.enabled)
+            {
+              printf("Server is not running.\n");
+              return;
+            }
+
+            const auto* cmd = params.get(0);
+            if (params.size() < 2)
+            {
+              printf(
+                  "Usage: %s <GUID> : remove VIP from the specified client\n",
+                  cmd);
+              return;
+            }
+
+            const auto* guid = params.get(1);
+            if (std::strstr(guid, "bot") != nullptr)
+            {
+              return;
+            }
+
+            remove_reserved_client(params.get(1));
           });
     }
 
@@ -350,8 +393,7 @@ namespace reserved
         auto* client = &game::svs_clients[i];
         assert(client->state);
 
-        const auto is_reserved = is_client_reserved(client->playerGuid);
-        if (is_reserved)
+        if (is_client_reserved(client->playerGuid))
         {
           ++count;
         }
