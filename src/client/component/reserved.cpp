@@ -225,10 +225,8 @@ namespace reserved
       scheduler::once(save_reserved_list, scheduler::pipeline::async);
     }
 
-    game::client_s* get_player_by_num()
+    game::client_s* get_player_by_num(const command::params_sv& params)
     {
-      const command::params_sv params;
-
       auto* com_sv_running = game::Dvar_FindVar("sv_running");
       if (!com_sv_running->current.enabled)
       {
@@ -304,7 +302,7 @@ namespace reserved
 
             if (utils::string::is_number(params.get(1)))
             {
-              const auto* client = get_player_by_num();
+              const auto* client = get_player_by_num(params);
               if (!client)
               {
                 return;
